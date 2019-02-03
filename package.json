@@ -1,0 +1,32 @@
+{
+  "name": "js-son",
+  "version": "0.0.1",
+  "description": "js-son - a Minimal JavaScript BDI Agent Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/jasmine/bin/jasmine.js",
+    "doc": "./node_modules/jsdoc/jsdoc.js src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimKam/js-son.git"
+  },
+  "keywords": [
+    "Agents",
+    "BDI",
+    "JavaScript"
+  ],
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/TimKam/js-son/issues"
+  },
+  "homepage": "https://github.com/TimKam/js-son#readme",
+  "devDependencies": {
+    "eslint": "^5.11.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "jasmine": "^3.3.1",
+    "jsdoc": "^3.5.5"
+  }
+}

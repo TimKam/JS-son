@@ -5,12 +5,11 @@
  * @returns {object} JS-plan
  */
 
- const Plan = (head, body) => ({
-     head,
-     body,
-     // run: executed body if head is true; else: return null
-     run: beliefs => head(beliefs) === true ? body() : null
- })
+const Plan = (head, body) => ({
+  head,
+  body,
+  // run: executed body if head is true; else: return null
+  run: beliefs => head(beliefs) === true ? body() : null
+})
 
- module.exports = Plan
- 
+module.exports = Plan

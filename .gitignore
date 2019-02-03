@@ -65,3 +65,6 @@ typings/
 
 #
 *.DS_Store
+
+# vscode
+.vscode/

@@ -9,7 +9,7 @@ describe('Plan / run()', () => {
     ...Desire('praiseDog', beliefs => beliefs.dogNice),
     ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
   }
-  const preferenceFunction = desireKey => {
+  const preferenceFunctionGen = (beliefs, desires) => desireKey => {
     if (!desires[desireKey](beliefs)) {
       return false
     } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
@@ -25,13 +25,13 @@ describe('Plan / run()', () => {
 
   it('should return ``null`` if head does not resolve to ``true``', () => {
     beliefs.dogHungry = true
-    const intentions = Intentions(beliefs, desires, preferenceFunction)
+    const intentions = Intentions(beliefs, desires, preferenceFunctionGen)
     expect(praiseDog.run(intentions)).toBe(null)
   })
 
   it('should return the result of its body if head resolves to ``true``', () => {
     beliefs.dogHungry = false
-    const intentions = Intentions(beliefs, desires, preferenceFunction)
+    const intentions = Intentions(beliefs, desires, preferenceFunctionGen)
     const expectedPlanResult = {
       actions: ['Good dog!']
     }

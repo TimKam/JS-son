@@ -17,7 +17,11 @@ function Agent (id, beliefs, desires, plans, determinePreferences) {
   this.plans = plans
   this.preferenceFunction = determinePreferences
   this.isActive = true
-  this.next = function () {
+  this.next = function (beliefs) {
+    this.beliefs = {
+      ...this.beliefs,
+      ...beliefs
+    }
     if (this.isActive) {
       this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)
       return this.plans.map(

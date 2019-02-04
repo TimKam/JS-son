@@ -1,6 +1,6 @@
 /**
  * JS-son environment generator
- * @param {object} agents JS-son agents to run
+ * @param {array} agents JS-son agents to run
  * @param {object} state Initial environment state
  * @param {function} update Update function, in particular for processing agent actions
  * @param {function} render Visualization function of the environment's current state
@@ -11,7 +11,7 @@ function Environment (
   agents,
   state,
   update,
-  render = () => console.log(state),
+  render = state => console.log(state),
   stateFilter = state => state
 ) {
   this.agents = {}
@@ -23,20 +23,21 @@ function Environment (
   this.run = iterations => {
     const run = () => {
       Object.keys(this.agents).forEach(agentKey => {
-        const proposedUpdate = agents[agentKey].next(this.stateFilter(this.state))
+        const proposedUpdate = this.agents[agentKey].next(this.stateFilter(this.state))
+        const stateUpdate = this.update(proposedUpdate)
         this.state = {
           ...this.state,
-          ...update(proposedUpdate)
+          ...stateUpdate
         }
       })
       this.render(this.state)
     }
     if (iterations) {
-      Array(iterations).forEach(run())
+      Array(iterations).fill(0).forEach(run)
     } else {
       while (true) run()
     }
   }
 }
 
-export default Environment
+module.exports = Environment

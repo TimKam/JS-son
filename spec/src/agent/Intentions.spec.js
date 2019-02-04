@@ -10,7 +10,7 @@ describe('Intentions()', () => {
   }
 
   it('should filter intentions according to provided preference function', () => {
-    const preferenceFunction = (desireKey) => {
+    const preferenceFunctionGen = (beliefs, desires) => (desireKey) => {
       if (!desires[desireKey](beliefs)) {
         return false
       } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
@@ -19,7 +19,7 @@ describe('Intentions()', () => {
         return false
       }
     }
-    const intentions = Intentions(beliefs, desires, preferenceFunction)
+    const intentions = Intentions(beliefs, desires, preferenceFunctionGen)
     expect(Object.keys(intentions)).toEqual(['feedDog'])
   })
 })

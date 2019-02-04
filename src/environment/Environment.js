@@ -20,7 +20,10 @@ function Environment (
   this.update = update
   this.render = render
   this.stateFilter = stateFilter
+  this.history = []
+  this.reset = () => (this.history = [])
   this.run = iterations => {
+    this.history.push(this.state)
     const run = () => {
       Object.keys(this.agents).forEach(agentKey => {
         const proposedUpdate = this.agents[agentKey].next(this.stateFilter(this.state))
@@ -30,6 +33,7 @@ function Environment (
           ...stateUpdate
         }
       })
+      this.history.push(this.state)
       this.render(this.state)
     }
     if (iterations) {
@@ -37,6 +41,7 @@ function Environment (
     } else {
       while (true) run()
     }
+    return this.history
   }
 }
 

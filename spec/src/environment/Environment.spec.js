@@ -7,36 +7,61 @@ const Environment = require('../../../src/environment/Environment')
 console.log = jasmine.createSpy('log')
 
 describe('Environment / run()', () => {
-  const createAgent = () => {
+  const createAgent = (type) => {
     const beliefs = {
       ...Belief('dogNice', true),
       ...Belief('dogHungry', false)
     }
-    const desires = {
-      ...Desire('praiseDog', beliefs => beliefs.dogNice),
-      ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
-    }
-    const preferenceFunctionGen = (beliefs, desires) => desireKey => {
-      if (!desires[desireKey](beliefs)) {
-        return false
-      } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
-        return true
-      } else {
-        return false
+    if (type === 'human') {
+      const desires = {
+        ...Desire('praiseDog', beliefs => beliefs.dogNice),
+        ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
       }
+      const preferenceFunctionGen = (beliefs, desires) => desireKey => {
+        if (!desires[desireKey](beliefs)) {
+          return false
+        } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
+          return true
+        } else {
+          return false
+        }
+      }
+      const plans = [
+        Plan(intentions => intentions.praiseDog, () => ({
+          actions: ['Good dog!']
+        })),
+        Plan(intentions => intentions.feedDog, () => ({
+          actions: ['Here, take some food!']
+        }))
+      ]
+      return new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
+    } else {
+      const desires = {
+        ...Desire('praiseDog', beliefs => beliefs.dogNice),
+        ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
+      }
+      const preferenceFunctionGen = (beliefs, desires) => desireKey => {
+        if (!desires[desireKey](beliefs)) {
+          return false
+        } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
+          return true
+        } else {
+          return false
+        }
+      }
+      const plans = [
+        Plan(intentions => intentions.praiseDog, () => ({
+          actions: ['Good dog!']
+        })),
+        Plan(intentions => intentions.feedDog, () => ({
+          actions: ['Here, take some food!']
+        }))
+      ]
+      return new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
     }
-    const plans = [
-      Plan(intentions => intentions.praiseDog, () => ({
-        actions: ['Good dog!']
-      })),
-      Plan(intentions => intentions.feedDog, () => ({
-        actions: ['Here, take some food!']
-      }))
-    ]
-    return new Agent('myAgent', beliefs, desires, plans, preferenceFunctionGen)
   }
 
-  const agent1 = createAgent()
+  const human = createAgent('human')
 
   const state = {
     dogNice: true,
@@ -47,18 +72,24 @@ describe('Environment / run()', () => {
     return actions.some(action => action.actions.includes('Here, take some food!')) ? { dogHungry: false } : {}
   }
 
-  const environment = new Environment([agent1], state, update)
-
   it('Should process agent actions', () => {
+    const environment = new Environment([human], state, update)
     environment.run(1)
     expect(console.log).toHaveBeenCalledWith({ dogNice: true, dogHungry: false })
   })
 
   /*it('Should allow agent-to-agent interaction', () => {
-    expect(true).toBe(false)
-  })
+    expect(true).toBe(true)
+  })*/
 
   it('Should terminate after the specified number of iterations', () => {
-    expect(true).toBe(false)
-  })*/
+    const environment = new Environment([human], state, update)
+    const history = environment.run(2)
+    const expectedHistory = [
+      { dogNice: true, dogHungry: true },
+      { dogNice: true, dogHungry: false },
+      { dogNice: true, dogHungry: false }
+    ]
+    expect(history).toEqual(expectedHistory)
+  })
 })

@@ -68,7 +68,17 @@ The documentation will be placed (as HTML files) to the ``out`` directory.
 
 ## Contributions
 We welcome contributions.
-Before you create a pull request, ensure the tests pass and add test cases that cover the code you contribute.
+Contributors should consider the following conventions:
+
+  * Be nice.
+
+  * Add tests for your code and make sure all tests pass.
+
+  * Add/update JSdoc comments.
+
+  * Ensure ESLint does not show any errors or warnings.
+
+  * Reference relevant issues in commits and branch names.
 
 ## Acknowledgements
 **Author**: Timotheus Kampik - [@TimKam](https://github.com/TimKam)

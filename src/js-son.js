@@ -1,9 +1,9 @@
 const Belief = require('./agent/Belief')
-const Desire = require('../../../src/agent/Desire')
-const Intentions = require('../../../src/agent/Intentions')
-const Plan = require('../../../src/agent/Plan')
-const Agent = require('../../../src/agent/Agent')
-const Environment = require('../../../src/environment/Environment')
+const Desire = require('./agent/Desire')
+const Intentions = require('./agent/Intentions')
+const Plan = require('./agent/Plan')
+const Agent = require('./agent/Agent')
+const Environment = require('./environment/Environment')
 
 const JSson = {
   Belief,
@@ -14,4 +14,4 @@ const JSson = {
   Environment
 }
 
-export default JSson
+module.exports = JSson

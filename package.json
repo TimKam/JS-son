@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/jasmine/bin/jasmine.js",
-    "doc": "./node_modules/jsdoc/jsdoc.js src"
+    "doc": "./node_modules/jsdoc/jsdoc.js src/*"
   },
   "repository": {
     "type": "git",

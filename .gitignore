@@ -68,3 +68,6 @@ typings/
 
 # vscode
 .vscode/
+
+# JS doc
+out/

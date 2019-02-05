@@ -2,6 +2,6 @@
 entry point
 */
 
-import * as js_son from './src/js-son.js'
+const JSson = require('./src/JS-son')
 
-export default js_son
+module.exports = JSson

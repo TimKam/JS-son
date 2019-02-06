@@ -23,7 +23,11 @@ function Agent (id, beliefs, desires, plans, determinePreferences) {
       ...beliefs
     }
     if (this.isActive) {
-      this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)
+      if (Object.keys(desires).length === 0 && determinePreferences === undefined) {
+        this.intentions = this.beliefs
+      } else {
+        this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)
+      }
       return this.plans.map(
         plan => plan.run(this.intentions)
       ).filter(

@@ -1,0 +1,25 @@
+{
+  "name": "js-son-example",
+  "version": "0.0.1",
+  "description": "Simple JS-son example for Node.js",
+  "main": "beliefPlan.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example-belief-plan": "node beliefPlan.js"
+  },
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "js-son": "file:../../"
+  },
+  "devDependencies": {
+    "eslint": "^5.13.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}

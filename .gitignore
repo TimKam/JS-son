@@ -71,3 +71,7 @@ typings/
 
 # JS doc
 out/
+
+# Examples
+examples/node/package-lock.json
+examples/node/node_modules/

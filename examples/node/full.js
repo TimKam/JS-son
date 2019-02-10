@@ -37,7 +37,7 @@ const {
   Plan,
   Agent,
   Environment
-} = require('../../src/js-son')
+} = require('js-son-agent')
 
 // Then, we create the belief sets the agents start with:
 const beliefsTrue = {

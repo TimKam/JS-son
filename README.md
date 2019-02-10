@@ -33,22 +33,22 @@ The environment provides the agents' "perceptors" with belief updates and proces
 
 
 ## Requirements & Installation
-Installing ``js-son`` requires [npm](https://nodejs.org/) or [yarn](https://yarnpkg.com).
+Installing *JS-son* requires [npm](https://nodejs.org/) or [yarn](https://yarnpkg.com).
 
-To install ``js-son``, run:
+To install *JS-son*, run:
 
 ```
-npm install js-son
+npm install js-son-agent
 ```
 
 or:
 
 ```
-yarn add js-son
+yarn add js-son-agent
 ```
 
 ## Tutorials
-To illustrate how JS-son works, we present two tutorials.
+To illustrate how *JS-son* works, we present two tutorials.
 In the first one, we use the simplified belief-plan approach; the second tutorial presents the full belief-desire-intention-plan approach.
 You find the source code of the tutorials at [https://github.com/TimKam/JS-son/tree/master/examples/node](https://github.com/TimKam/JS-son/tree/master/examples/node).
 
@@ -70,7 +70,7 @@ The simulation runs twenty iterations of the scenario. In an iteration, each age
 First, we import *JS-son* and assign Belief, Plan, Agent, and Environment to separate ``consts`` for the sake of convenience:
 
 ```JavaScript
-const JSson = require('js-son')
+const JSson = require('js-son-agent')
 
 const Belief = JSson.Belief
 const Plan = JSson.Plan
@@ -259,7 +259,7 @@ const {
   Plan,
   Agent,
   Environment
-} = require('../../src/js-son')
+} = require('js-son-agent')
 ```
 
 Then, we create the belief sets the agents start with:

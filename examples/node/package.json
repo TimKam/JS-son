@@ -11,7 +11,7 @@
   "author": "Timotheus Kampik",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "js-son": "file:../../"
+    "js-son-agent": "file:../../"
   },
   "devDependencies": {
     "eslint": "^5.13.0",

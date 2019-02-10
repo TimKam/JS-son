@@ -5,7 +5,8 @@
   "main": "beliefPlan.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "example-belief-plan": "node beliefPlan.js"
+    "example-belief-plan": "node beliefPlan.js",
+    "example-full": "node full.js"
   },
   "author": "Timotheus Kampik",
   "license": "BSD-2-Clause",

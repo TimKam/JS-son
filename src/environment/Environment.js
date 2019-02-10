@@ -26,7 +26,9 @@ function Environment (
     this.history.push(this.state)
     const run = () => {
       Object.keys(this.agents).forEach(agentKey => {
-        const proposedUpdate = this.agents[agentKey].next(this.stateFilter(this.state, agentKey))
+        const proposedUpdate = this.agents[agentKey].next(
+          this.stateFilter(this.state, agentKey, this.agents[agentKey].beliefs)
+        )
         const stateUpdate = this.update(proposedUpdate, agentKey, this.state)
         this.state = {
           ...this.state,

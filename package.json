@@ -5,7 +5,8 @@
   "main": "src/js-son.js",
   "scripts": {
     "test": "./node_modules/jasmine/bin/jasmine.js",
-    "doc": "./node_modules/jsdoc/jsdoc.js src/*"
+    "doc": "./node_modules/jsdoc/jsdoc.js src/*",
+    "lint": "./node_modules/.bin/eslint -c .eslintrc.yml \"./**/*.js\""
   },
   "repository": {
     "type": "git",

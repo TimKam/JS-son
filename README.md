@@ -6,7 +6,7 @@
 Install it with:
 
 ```
-npm install js-son
+npm install js-son-agent
 ```
 
 ## Belief-Desire-Intention (BDI) Agents
@@ -464,7 +464,7 @@ environment.run(50)
 ```
 
 ## Supported Platforms
-``js-son`` supports recent versions of Firefox, Chrome, and Node.js.
+*JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.
 Contributions that change this are welcome!
 
@@ -474,7 +474,7 @@ Run the tests with ``npm test``.
 The tests also run on Travis-CI.
 
 ## Documentation
-``js-son`` is documented with [JSDoc](http://usejsdoc.org/). Generate the documentation by running: ``npm run doc``.
+*JS-son* is documented with [JSDoc](http://usejsdoc.org/). Generate the documentation by running: ``npm run doc``.
 The documentation will be placed (as HTML files) to the ``out`` directory.
 
 ## Contributions

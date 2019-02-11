@@ -467,6 +467,17 @@ Finally, we run 50 iterations of the scenario:
 environment.run(50)
 ```
 
+## Further Examples
+
+### Data Science
+To show how *JS-son* can be used with state-of-the art data science tools, we provide a multi-agent simulation example that runs in a Jupyter notebook and integrates with Python data visualization libraries. The simulation compares belief spread among agents in different environments and is based on the [belief-desire-intention(-plan) tutorial](https://github.com/TimKam/JS-son#belief-desire-intention-plan-approach).
+
+You find the Jupyter notebook in the example folder of the *JS-son* Github repository, as well as [here on Google Colab](https://colab.research.google.com/drive/1_viwoWyOIl8SH61WEAnEpndbR18WHPf3).
+
+**Note**: The interactive widget that is provided as part of the notebook only works with "full"/local Jupyter notebook tools and not on Google Colab, as it requires the [ipywidgets library](https://ipywidgets.readthedocs.io/en/stable/), which Google Colab does not support.
+
+
+
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.

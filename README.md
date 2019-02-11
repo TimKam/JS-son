@@ -47,6 +47,10 @@ or:
 yarn add js-son-agent
 ```
 
+## Dependencies
+*JS-son* does not have any dependencies! This means you can require it in your application without worrying about bloat or unstable/insecure upstream modules.
+Only when you want to work on the *JS-son* code base, you should install some *dev dependencies* for linting an testing.
+
 ## Tutorials
 To illustrate how *JS-son* works, we present two tutorials.
 In the first one, we use the simplified belief-plan approach; the second tutorial presents the full belief-desire-intention-plan approach.

@@ -1,0 +1,52 @@
+/* Custom color theme properties */
+:root {
+  --f7-theme-color: #304763;
+  --f7-theme-color-rgb: 48, 71, 99;
+  --f7-theme-color-shade: #233348;
+  --f7-theme-color-tint: #3d5b7e;
+}
+
+/*** Custom styles ***/
+
+/* Header, Intro */
+.title-large, .intro-div {
+  text-align: center;
+}
+
+.intro-text {
+  max-width: 500px;
+  display: inline-block;
+  padding-bottom: 25px;
+}
+
+/* Game of Life */
+#game-of-life-grid {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.agent {
+  color: transparent;
+  min-height: 25px;
+}
+
+.inactive-agent {
+  background-color: #fff;
+}
+
+.active-agent {
+  background-color: #304763;
+}
+
+/* Controls */
+.controls {
+  padding-top: 50px;
+}
+
+.controls .button {
+  max-width: 250px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+

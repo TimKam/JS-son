@@ -476,7 +476,13 @@ You find the Jupyter notebook in the example folder of the *JS-son* Github repos
 
 **Note**: The interactive widget that is provided as part of the notebook only works with "full"/local Jupyter notebook tools and not on Google Colab, as it requires the [ipywidgets library](https://ipywidgets.readthedocs.io/en/stable/), which Google Colab does not support.
 
+### Web Application
+Of course, *JS-son* can also be used in web application development.
+To illustrate how, we implemented [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway's_Game_of_Life), using *JS-son*'s belief-plan approach.
+We integrated the Game of Life simulation in a [Framework7](https://framework7.io/) application. The web application runs online at [https://people.cs.umu.se/~tkampik/demos/js-son/](https://people.cs.umu.se/~tkampik/demos/js-son/).
 
+You find the the source code of the web application [here in the examples directory](https://github.com/TimKam/JS-son/tree/master/examples/web).
+To run the example, install its dependencies with ``npm install`` and run the application in development (hot-reload) mode with ``npm run dev``.
 
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.

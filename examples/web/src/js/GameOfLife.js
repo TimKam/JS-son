@@ -52,20 +52,22 @@ const plans = [
   )
 ]
 
-// generates 100 agents with (pseudo-)random initial beliefs (active or inactive)
-const initialActivity = new Array(100).fill(0).map((_, index) => Math.random() < 0.5)
-const agents = initialActivity.map((value, index) => {
+// generates (pseudo-)random initial activity state (active or inactive)
+const generateInitialActivity = () => new Array(100).fill(0).map((_, index) => Math.random() < 0.5)
+
+// generates 100 agents with provided initial activity state
+const generateAgents = initialActivity => initialActivity.map((value, index) => {
   const beliefs = { ...Belief('index', index), ...Belief('activityArray', initialActivity) }
   return new Agent(index, beliefs, {}, plans)
 })
 
 /*
-set initial environment state
+generate initial environment state
 */
-const state = {
+const generateState = initialActivity => ({
   previousActivity: initialActivity,
   nextActivity: []
-}
+})
 
 // state update function: collect future state of agents to assign new agent states next round
 const updateState = (actions, agentId, currentState) => {
@@ -108,12 +110,16 @@ const render = state => {
 }
 
 // instantiate game of life as new environment
-const GameOfLife = () => new Environment(
-  agents,
-  state,
-  updateState,
-  render,
-  stateFilter
-)
+const GameOfLife = () => {
+  const initialActivity = generateInitialActivity()
+
+  return new Environment(
+    generateAgents(initialActivity),
+    generateState(initialActivity),
+    updateState,
+    render,
+    stateFilter
+  )
+}
 
 export default GameOfLife

@@ -18,18 +18,19 @@ neighbors.
 /*
   determine how many neighbors of an agent are active
 */
-const determineNeighborActivity = (index, activityArray) =>
-  [
-    activityArray[index - 11],
-    activityArray[index - 10],
-    activityArray[index - 9],
-    activityArray[index - 1],
-    activityArray[index + 1],
-    activityArray[index + 9],
-    activityArray[index + 10],
-    activityArray[index + 11]
+const determineNeighborActivity = (index, activityArray) => {
+  const leftNeighbors = index % 10 === 0
+    ? []
+    : [activityArray[index - 11], activityArray[index - 1], activityArray[index + 9]]
 
-  ].filter(element => element).length
+  const rightNeighbors = index % 10 === 9
+    ? []
+    : [activityArray[index - 9], activityArray[index + 1], activityArray[index + 11]]
+  return [
+    activityArray[index - 10],
+    activityArray[index + 10]
+  ].concat(leftNeighbors, rightNeighbors).filter(element => element).length
+}
 
 const plans = [
   Plan(

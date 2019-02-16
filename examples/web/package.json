@@ -37,7 +37,7 @@
     "framework7": "^4.0.1",
     "framework7-icons": "^2.2.0",
     "template7": "^1.4.1",
-    "js-son-agent": "file:../../"
+    "js-son-agent": "js-son-agent"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

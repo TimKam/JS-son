@@ -1,6 +1,6 @@
 {
   "name": "js-son-agent",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JS-son - a Minimal JavaScript BDI Agent Library",
   "main": "lib/js-son.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "doc": "./node_modules/jsdoc/jsdoc.js src/*",
     "lint": "./node_modules/.bin/eslint -c .eslintrc.yml \"./**/*.js\"",
     "build": "babel src -d lib",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",

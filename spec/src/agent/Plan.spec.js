@@ -1,24 +1,13 @@
-const Belief = require('../../../src/agent/Belief')
-const Desire = require('../../../src/agent/Desire')
 const Intentions = require('../../../src/agent/Intentions')
 const Plan = require('../../../src/agent/Plan')
 
-describe('Plan / run()', () => {
-  const beliefs = { ...Belief('dogNice', true), ...Belief('dogHungry', true) }
-  const desires = {
-    ...Desire('praiseDog', beliefs => beliefs.dogNice),
-    ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
-  }
-  const preferenceFunctionGen = (beliefs, desires) => desireKey => {
-    if (!desires[desireKey](beliefs)) {
-      return false
-    } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
-      return true
-    } else {
-      return false
-    }
-  }
+const {
+  beliefs,
+  desires,
+  preferenceFunctionGen
+} = require('../../mocks/human')
 
+describe('Plan / run()', () => {
   const praiseDog = Plan(intentions => intentions.praiseDog, () => ({
     actions: ['Good dog!']
   }))

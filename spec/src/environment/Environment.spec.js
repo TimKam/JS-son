@@ -1,69 +1,24 @@
-const Belief = require('../../../src/agent/Belief')
-const Desire = require('../../../src/agent/Desire')
-const Plan = require('../../../src/agent/Plan')
 const Agent = require('../../../src/agent/Agent')
 const Environment = require('../../../src/environment/Environment')
+
+const {
+  beliefs,
+  desires,
+  preferenceFunctionGen,
+  plans
+} = require('../../mocks/human')
+
+const {
+  dogBeliefs,
+  dogDesires,
+  dogPreferenceFunctionGen,
+  dogPlans
+} = require('../../mocks/dog')
 
 console.log = jasmine.createSpy('log')
 
 describe('Environment / run()', () => {
-  const createAgent = (type) => {
-    const beliefs = {
-      ...Belief('dogNice', true),
-      ...Belief('dogHungry', false)
-    }
-    if (type === 'human') {
-      const desires = {
-        ...Desire('praiseDog', beliefs => beliefs.dogNice),
-        ...Desire('feedDog', beliefs => beliefs.dogNice && beliefs.dogHungry)
-      }
-      const preferenceFunctionGen = (beliefs, desires) => desireKey => {
-        if (!desires[desireKey](beliefs)) {
-          return false
-        } else if (desireKey === 'feedDog' || !desires['feedDog'](beliefs)) {
-          return true
-        } else {
-          return false
-        }
-      }
-      const plans = [
-        Plan(intentions => intentions.praiseDog, () => ({
-          actions: ['Good dog!']
-        })),
-        Plan(intentions => intentions.feedDog, () => ({
-          actions: ['Here, take some food!']
-        }))
-      ]
-      return new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
-    } else {
-      beliefs.foodAvailable = false
-      beliefs.dogRecentlyPraised = false
-      const desires = {
-        ...Desire('wagTail', beliefs => beliefs.recentlyPraised),
-        ...Desire('eat', beliefs => beliefs.foodAvailable && beliefs.dogHungry)
-      }
-      const preferenceFunctionGen = (beliefs, desires) => desireKey => {
-        if (!desires[desireKey](beliefs)) {
-          return false
-        } else if (desireKey === 'eat' || !desires['eat'](beliefs)) {
-          return true
-        } else {
-          return false
-        }
-      }
-      const plans = [
-        Plan(intentions => intentions.eat, () => ({
-          actions: ['Eat']
-        })),
-        Plan(intentions => intentions.wagTail, () => ({
-          actions: ['Wag tail']
-        }))
-      ]
-      return new Agent('dog', beliefs, desires, plans, preferenceFunctionGen)
-    }
-  }
-
-  const human = createAgent('human')
+  const human = new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
 
   const state = {
     dogNice: true,
@@ -81,7 +36,9 @@ describe('Environment / run()', () => {
   })
 
   it('Should allow agent-to-agent interaction', () => {
-    const dog = createAgent('dog')
+    const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
+    // console.log(dog)
+    // const dog = createAgent('dog')
     const updateMAS = actions => {
       const stateUpdate = {}
       actions.forEach(action => {

@@ -1,46 +1,26 @@
 /* Integration test for simplified belief-plan approach */
 const {
-  Belief,
-  Desire, // eslint-disable-line no-unused-vars
-  Intentions, // eslint-disable-line no-unused-vars
-  Plan,
   Agent,
   Environment
 } = require('../../src/js-son')
 
-describe('Integration: belief-plan approach', () => {
-  const createAgent = (type) => {
-    const beliefs = {
-      ...Belief('dogNice', true),
-      ...Belief('dogHungry', false)
-    }
-    if (type === 'human') {
-      const plans = [
-        Plan(beliefs => beliefs.dogNice, () => ({
-          actions: ['Good dog!']
-        })),
-        Plan(beliefs => beliefs.dogHungry, () => ({
-          actions: ['Here, take some food!']
-        }))
-      ]
-      return new Agent('human', beliefs, {}, plans)
-    } else {
-      beliefs.foodAvailable = false
-      beliefs.dogRecentlyPraised = false
-      const plans = [
-        Plan(beliefs => beliefs.dogHungry && beliefs.foodAvailable, () => ({
-          actions: ['Eat']
-        })),
-        Plan(beliefs => beliefs.dogRecentlyPraised, () => ({
-          actions: ['Wag tail']
-        }))
-      ]
-      return new Agent('dog', beliefs, {}, plans)
-    }
-  }
+const {
+  beliefs,
+  desires,
+  preferenceFunctionGen,
+  plans
+} = require('../mocks/human')
 
-  const human = createAgent('human')
-  const dog = createAgent('dog')
+const {
+  dogBeliefs,
+  dogDesires,
+  dogPreferenceFunctionGen,
+  dogPlans
+} = require('../mocks/dog')
+
+describe('Integration: belief-plan approach', () => {
+  const human = new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
+  const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
 
   const state = {
     dogNice: true,

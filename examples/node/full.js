@@ -195,8 +195,10 @@ const stateFilter = (state, agentKey, agentBeliefs) => {
     () => 0.5 - Math.random()
   ).slice(0, 2)
   // add some noise
-  let noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 50 * Math.random() ? [true] : []
-  noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 29 * Math.random() ? [false] : noise
+  let noise = Object.keys(state).filter(
+    agentId => state[agentId].keyBelief).length < 50 * Math.random() ? [true] : []
+  noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 29 * Math.random()
+    ? [false] : noise
   // combine announcements
   const pastReceivedAnnouncements =
     recentVolatileAnnouncements.concat(

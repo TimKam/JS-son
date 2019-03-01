@@ -26,7 +26,8 @@ describe('Environment / run()', () => {
   }
 
   const update = actions => {
-    return actions.some(action => action.actions.includes('Here, take some food!')) ? { dogHungry: false } : {}
+    return actions.some(action => action.actions.includes('Here, take some food!'))
+      ? { dogHungry: false } : {}
   }
 
   it('Should process agent actions', () => {

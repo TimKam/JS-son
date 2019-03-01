@@ -33,7 +33,6 @@ We import the JS-son dependencies:
 const {
   Belief,
   Desire,
-  Intentions, // eslint-disable-line no-unused-vars
   Plan,
   Agent,
   Environment

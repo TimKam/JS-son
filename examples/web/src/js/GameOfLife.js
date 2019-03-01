@@ -1,12 +1,7 @@
 // import DOM helper for render function
 import $$ from 'dom7'
-// import js-son
-const JSson = require('js-son-agent')
-// assign Belief, Plan, Agent, and Environment to separate consts
-const Belief = JSson.Belief
-const Plan = JSson.Plan
-const Agent = JSson.Agent
-const Environment = JSson.Environment
+// import js-son and assign Belief, Plan, Agent, and Environment to separate consts
+const { Belief, Plan, Agent, Environment } = require('js-son-agent')
 
 /*
 Note: beliefs will be created dynamically at a later stage

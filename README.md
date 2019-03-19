@@ -484,6 +484,10 @@ We integrated the Game of Life simulation in a [Framework7](https://framework7.i
 You find the the source code of the web application [here in the examples directory](https://github.com/TimKam/JS-son/tree/master/examples/web).
 To run the example, install its dependencies with ``npm install`` and run the application in development (hot-reload) mode with ``npm run dev``.
 
+### Grid World
+By default, *JS-son* supports grid world environments.
+A comprehensive multi-agent grid world tutorial is provided [here in the examples section](./examples/arena/README.md).
+
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.
@@ -514,5 +518,16 @@ Contributors should consider the following conventions:
 
 ## Acknowledgements
 **Author**: Timotheus Kampik - [@TimKam](https://github.com/TimKam)
+
+**Cite as**:
+
+```
+@inproceedings{js-son,
+  title={{JS-son - A Minimalistic JavaScript BDI Agent Library}},
+  author={Kampik, Timotheus and Nieves, Juan Carlos},
+  booktitle={7th International Workshop on Engineering Multi-Agent Systems (EMAS 2019), Montreal, Canada, 13--14 May, 2019},
+  year={2019}
+}
+```
 
 This work was partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.

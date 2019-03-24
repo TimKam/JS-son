@@ -18,7 +18,7 @@ describe('Agent / next()', () => {
 
   it('should return plan execution result for active plans', () => {
     agent.start()
-    expect(agent.next(beliefs)).toContain({
+    expect(agent.next({ ...beliefs, dogHungry: false })).toContain({
       actions: ['Good dog!']
     })
   })

@@ -1,0 +1,94 @@
+/* Custom color theme properties */
+:root {
+  --f7-theme-color: #304763;
+  --f7-theme-color-rgb: 48, 71, 99;
+  --f7-theme-color-shade: #233348;
+  --f7-theme-color-tint: #3d5b7e;
+}
+
+/*** Custom styles ***/
+
+/* Header, Intro */
+.title-large, .intro-div {
+  text-align: center;
+}
+
+.intro-text {
+  max-width: 550px;
+  display: inline-block;
+  padding-bottom: 25px;
+}
+
+/* Arena / Grid World */
+#arena-grid, #analysis {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#analysis {
+  margin-top: 20px;
+}
+
+#analysis table {
+  margin: 0 auto;
+}
+
+td {
+  height: 25px;
+  width: 25px;
+  display: table-cell !important;
+}
+
+.plain-field {
+  background-color: #73A790
+}
+
+.mountain-field {
+  background-color: #F0EEE3
+}
+
+.diamond-field {
+  background-color: #D7B17C
+}
+
+.repair-field {
+  background-color: #EABAB9
+}
+
+/* Controls */
+.controls {
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+
+.controls .button {
+  max-width: 250px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.material-icons.money::before{
+  content: "monetization_on";
+}
+
+.material-icons.build::before{
+  content: "build"; 
+}
+
+.material-icons.mountain::before{
+  content: "keyboard_arrow_up";
+}
+
+.material-icons.robot::before{
+  content: "android";
+}
+
+.field-annotation {
+  color: red;
+  position: absolute;
+  font-family: initial;
+  margin-top: -18px;
+  margin-left: 7px;
+  font-weight: bold;
+}

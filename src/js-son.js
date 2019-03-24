@@ -4,7 +4,9 @@ const JSson = {
   Intentions: require('./agent/Intentions'),
   Plan: require('./agent/Plan'),
   Agent: require('./agent/Agent'),
-  Environment: require('./environment/Environment')
+  Environment: require('./environment/Environment'),
+  GridWorld: require('./environment/GridWorld'),
+  FieldType: require('./environment/FieldType')
 }
 
 module.exports = JSson

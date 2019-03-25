@@ -100,11 +100,9 @@ const desiresIntrospective = {
 
 /*
 The agents desires are mutually exclusive. Hence, the agents' intentions merely relay their desires,
-which is reflected in the following preference function generator:
-*/
-const preferenceFunctionGen = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+which is reflected by the default preference function generator
+``(beliefs, desires) => desireKey => desires[desireKey](beliefs)``
 
-/*
 The agents' plans are to disseminate the announcement (``true`` or ``false``) as determined by the
 desire functions:
 */
@@ -141,8 +139,7 @@ const createAgents = () => {
       `${type}${index}`,
       { ...beliefs, ...Belief('type', type) },
       desires,
-      plans,
-      preferenceFunctionGen
+      plans
     )
   })
   const numberBeliefsTrue = Object.keys(state).filter(

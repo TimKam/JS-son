@@ -75,8 +75,7 @@ const generateAgents = initialState => initialState.positions.map((position, ind
     index,
     beliefs,
     desires,
-    plans,
-    (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+    plans
   )
 })
 

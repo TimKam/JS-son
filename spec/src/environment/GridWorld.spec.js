@@ -18,8 +18,7 @@ const agents = [1, 2, 3].map(value => new Agent(
   value,
   { ...Belief('testBelief', value) },
   desires,
-  plans,
-  (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+  plans
 ))
 
 const fieldType = FieldType(

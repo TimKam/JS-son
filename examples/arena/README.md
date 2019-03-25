@@ -163,7 +163,7 @@ const desires = {
 }
 ```
 
-From the desires, we jump directly to plans (see the provided function ``(beliefs, desires) => desireKey => desires[desireKey](beliefs)`` further below, which is generically applicable for this purpose).
+From the desires, we jump directly to plans.
 The plans simply relay the determined desire to the environment.
 
 ```javascript
@@ -212,8 +212,7 @@ const generateAgents = initialState => initialState.positions.map((position, ind
     index,
     beliefs,
     desires,
-    plans,
-    (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+    plans
   )
 })
 ```

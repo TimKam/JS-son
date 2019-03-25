@@ -32,4 +32,10 @@ describe('Agent / next()', () => {
     agent.start()
     expect(agent.next({ ...Belief('dogNice', false) }).length).toEqual(0)
   })
+
+  it('should apply the default preference function generation if no other is specified', () => {
+    const defaultPreferenceAgent = new Agent('myAgent', beliefs, desires, plans)
+    defaultPreferenceAgent.start()
+    expect(defaultPreferenceAgent.next({ ...beliefs, dogHungry: true }).length).toEqual(2)
+  })
 })

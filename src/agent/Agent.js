@@ -31,7 +31,7 @@ function Agent (
       ...beliefs
     }
     if (this.isActive) {
-      if (Object.keys(desires).length === 0 && determinePreferences === undefined) {
+      if (Object.keys(desires).length === 0) {
         this.intentions = this.beliefs
       } else {
         this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)

@@ -5,7 +5,8 @@ module.exports = {
   entry: './src/js-son.js',
   output: {
     path: path.resolve(__dirname, 'lib'),
-    filename: 'bundle.js'
+    filename: 'index.js',
+    libraryTarget: 'commonjs2'
   },
   module: {
     rules: [

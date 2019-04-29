@@ -1,6 +1,6 @@
 # JS-son - a Minimal JavaScript BDI Agent Library
 
-[![Build Status](https://travis-ci.org/TimKam/JS-son.svg?branch=master)](https://travis-ci.org/TimKam/JS-son)
+[![CircleCI](https://circleci.com/gh/TimKam/JS-son.svg?style=svg)](https://circleci.com/gh/TimKam/JS-son)
 
 ``JS-son`` is a minimal JavaScript library for implementing intelligent agents that follow the belief, desire, intention approach.
 Install it with:

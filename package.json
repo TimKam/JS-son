@@ -2,7 +2,7 @@
   "name": "js-son-agent",
   "version": "0.0.5",
   "description": "JS-son - a Minimal JavaScript BDI Agent Library",
-  "main": "lib/bundle.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/jasmine/bin/jasmine.js",
     "doc": "./node_modules/jsdoc/jsdoc.js src/*",

@@ -3,7 +3,7 @@ import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
 
 /* desires */
 const desires = {
-  ...Desire('go', beliefs => {
+  ...Desire('go', beliefs => { // states by keys index: 0: up, 1: down, 2: left, 3: right
     if (Math.random() < 0.25) { // random exploration
       return Object.keys(beliefs.neighborStates)[Math.floor(Math.random() * 4)]
     }
@@ -80,7 +80,7 @@ const generateAgents = initialState => initialState.positions.map((position, ind
 })
 
 /* generate pseudo-random initial state */
-const generateInitialState = () => {
+const generateInitialState = (numberAgents = 2) => {
   const dimensions = [20, 20]
   const positions = []
   const fields = Array(dimensions[0] * dimensions[1]).fill(0).map((_, index) => {
@@ -91,7 +91,7 @@ const generateInitialState = () => {
       return 'diamond'
     } else if (rand < 0.20) {
       return 'repair'
-    } else if (rand < 0.25 && positions.length < 10) {
+    } else if (rand < 0.25 && positions.length < numberAgents) {
       positions.push(index)
       return 'plain'
     } else {
@@ -101,8 +101,8 @@ const generateInitialState = () => {
   return {
     dimensions,
     positions,
-    coins: Array(10).fill(0),
-    health: Array(10).fill(10),
+    coins: Array(numberAgents).fill(0),
+    health: Array(numberAgents).fill(10),
     fields
   }
 }

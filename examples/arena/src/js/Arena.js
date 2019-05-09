@@ -189,6 +189,7 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   coins: state.coins[agentId],
   health: state.health[agentId],
   neighborStates: determineNeighborStates(state.positions[agentId], state),
+  fullGridWorld: state.positions // fully observable
 })
 
 const fieldTypes = {

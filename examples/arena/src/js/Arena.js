@@ -68,7 +68,7 @@ const generateAgents = initialState => initialState.positions.map((position, ind
   const beliefs = {
     ...Belief('neighborStates', determineNeighborStates(position, initialState)),
     ...Belief('position', position),
-    ...Belief('health', 10),
+    ...Belief('health', 100),
     ...Belief('coins', 0)
   }
   return new Agent(
@@ -102,9 +102,15 @@ const generateInitialState = (numberAgents = 2) => {
     dimensions,
     positions,
     coins: Array(numberAgents).fill(0),
-    health: Array(numberAgents).fill(10),
+    health: Array(numberAgents).fill(100),
     fields
   }
+}
+
+const genRandInt = (min, max) => {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
@@ -113,15 +119,16 @@ const generateConsequence = (state, agentId, newPosition) => {
       if (state.positions.includes(newPosition)) {
         state.health = state.health.map((healthScore, index) => {
           if (state.positions[index] === newPosition) {
-            if (state.health[index] <= 1) {
+            if (state.health[index] <= 10) {
               state.positions[index] = undefined
             }
-            return --healthScore
+            healthScore = healthScore - 10
+            return healthScore
           } else {
             return healthScore
           }
         })
-        state.health[agentId]--
+        state.health[agentId] = state.health[agentId] - 10
         if (state.health[agentId] <= 0) {
           state.positions[agentId] = undefined
         }
@@ -130,10 +137,22 @@ const generateConsequence = (state, agentId, newPosition) => {
       }
       break
     case 'diamond':
-      state.coins[agentId]++
+      state.coins[agentId] = state.coins[agentId] + 10
+      const coinDamage = genRandInt(1, 5)
+      if (agentId === 1) {
+        state.coins[0] = state.coins[0] - coinDamage
+      } else {
+        state.coins[1] = state.coins[1] - coinDamage
+      }
       break
     case 'repair':
-      if (state.health[agentId] < 10) state.health[agentId]++
+      if (state.health[agentId] < 10) state.health[agentId] = state.health[agentId] + 10
+      const healthDamage = genRandInt(1, 5)
+      if (agentId === 1) {
+        state.health[0] = state.health[0] - healthDamage
+      } else {
+        state.health[1] = state.health[1] - healthDamage
+      }
       break
   }
   return state
@@ -169,7 +188,7 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   ...agentBeliefs,
   coins: state.coins[agentId],
   health: state.health[agentId],
-  neighborStates: determineNeighborStates(state.positions[agentId], state)
+  neighborStates: determineNeighborStates(state.positions[agentId], state),
 })
 
 const fieldTypes = {

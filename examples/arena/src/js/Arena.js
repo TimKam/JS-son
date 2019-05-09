@@ -103,7 +103,8 @@ const generateInitialState = (numberAgents = 2) => {
     positions,
     coins: Array(numberAgents).fill(0),
     health: Array(numberAgents).fill(100),
-    fields
+    fields,
+    rewards: Array(numberAgents).fill([])
   }
 }
 
@@ -111,6 +112,41 @@ const genRandInt = (min, max) => {
   min = Math.ceil(min)
   max = Math.floor(max)
   return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const generateReward = (state, agentId, newPosition) => {
+  console.log('generateReward')
+  console.log(arena.state.positions)
+  const utility = {
+    'diamondDiamond': 7,
+    'repairDiamond': 7,
+    'repairFullDiamond': -3,
+    'deathDiamond': -100,
+    'otherDiamond': -3,
+    'diamondRepair': 7,
+    'repairRepair': 7,
+    'repairFullRepair': -3,
+    'deathRepair': -100,
+    'otherRepair': -3,
+    'diamondRepairFull': 7,
+    'repairRepairFull': 7,
+    'repairFullRepairFull': -3,
+    'deathRepairFull': -100,
+    'otherRepairFull': -3,
+    'diamondDeath': 10,
+    'repairDeath': 10,
+    'repairFullDeath': 0,
+    'deathDeath': -100,
+    'otherDeath': 0,
+    'diamondOther': 10,
+    'repairOther': 10,
+    'repairFullOther': 0,
+    'deathOther': -100,
+    'otherOther': 0
+  }
+  const fieldMovedToSelf = ''
+  const fieldMovedToOther = ''
+  return ''
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
@@ -139,7 +175,7 @@ const generateConsequence = (state, agentId, newPosition) => {
     case 'diamond':
       state.coins[agentId] = state.coins[agentId] + 10
       const coinDamage = genRandInt(1, 5)
-      if (agentId === 1) {
+      if (agentId === '1') {
         state.coins[0] = state.coins[0] - coinDamage
       } else {
         state.coins[1] = state.coins[1] - coinDamage
@@ -148,12 +184,22 @@ const generateConsequence = (state, agentId, newPosition) => {
     case 'repair':
       if (state.health[agentId] < 10) state.health[agentId] = state.health[agentId] + 10
       const healthDamage = genRandInt(1, 5)
-      if (agentId === 1) {
+      if (agentId === '1') {
         state.health[0] = state.health[0] - healthDamage
+        if (state.health[0] <= 0) {
+          state.positions[0] = undefined
+        }
       } else {
         state.health[1] = state.health[1] - healthDamage
+        if (state.health[1] <= 0) {
+          state.positions[1] = undefined
+        }
       }
       break
+  }
+  if (agentId === '1') {
+    state.rewards[0].push(generateReward(state, 0, state.fields[newPosition]))
+    state.rewards[1].push(generateReward(state, 1, state.fields[newPosition]))
   }
   return state
 }

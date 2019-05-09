@@ -9,6 +9,8 @@ import routes from './routes.js'
 // Game of Life
 import Arena from './Arena'
 
+window.arena = undefined
+
 var app = new Framework7({ // eslint-disable-line no-unused-vars
   root: '#app', // App root element
 
@@ -17,7 +19,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
   // App root data
   data: () => {
     $$(document).on('page:init', e => {
-      let arena = Arena()
+      arena = Arena()
       let shouldRestart = false
       $$('.restart-button').on('click', () => {
         shouldRestart = true

@@ -158,11 +158,46 @@ const genRandInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-const generatePreferences = (utilityMapping, possibleStates) => {
-  return ''
+const generatePreferences = (agentId, availableProfiles) => {
+  let genericPreferenceMapping
+  if (arena.state[agentId].health > 30) {
+    genericPreferenceMapping = [
+      'GetCoinsGetHealth',
+      'GetCoins',
+      'GetCoinsLoseHealth',
+      'GetHealth',
+      'Nothing',
+      'LoseHealth',
+      'LoseCoinsGetHealth',
+      'LoseCoins',
+      'LoseCoinsLoseHealth',
+      'Die'
+    ]
+  } else {
+    genericPreferenceMapping = [
+      'GetCoinsGetHealth',
+      'GetHealth',
+      'LoseCoinsGetHealth',
+      'GetCoins',
+      'Nothing',
+      'LoseCoins',
+      'GetCoinsLoseHealth',
+      'LoseHealth',
+      'LoseCoinsLoseHealth',
+      'Die'
+    ]
+  }
+
+  return genericPreferenceMapping.filter(
+    consequence =>
+      Object.keys(availableProfiles).some(profileConsequence =>
+        profileConsequence === consequence
+      )
+  ).map(consequence => availableProfiles[consequence])
 }
 
 const generateReward = (state, agentId, newPosition) => {
+  const preferences = generatePreferences()
   console.log('generateReward')
   console.log(arena.state.positions)
   const utilityMapping = {
@@ -253,6 +288,7 @@ const generateConsequence = (state, agentId, newPosition) => {
       break
   }
   if (agentId === '1') {
+    console.log(arena.state.health)
     //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
     //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
 

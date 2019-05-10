@@ -46,10 +46,14 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
                 <td><strong>Coins</strong></td>
                 ${arena.state.coins.map(coins => `<td>${coins}</td>`).join('')}
               </tr>
+              <tr>
+                <td><strong>Total Rewards</strong></td>
+                ${arena.state.rewards_acc.map(r => `<td>${r}</td>`).join('')}
+              </tr>
             </table>
           `)
         }
-      }, 2000)
+      }, 500)
     })
   },
   // App routes

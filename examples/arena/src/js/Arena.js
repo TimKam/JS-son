@@ -114,10 +114,14 @@ const genRandInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+const generatePreferences = (utilityMapping, possibleStates) => {
+  return ''
+}
+
 const generateReward = (state, agentId, newPosition) => {
   console.log('generateReward')
   console.log(arena.state.positions)
-  const utility = {
+  const utilityMapping = {
     'diamondDiamond': 7,
     'repairDiamond': 7,
     'repairFullDiamond': -3,
@@ -146,6 +150,8 @@ const generateReward = (state, agentId, newPosition) => {
   }
   const fieldMovedToSelf = ''
   const fieldMovedToOther = ''
+
+  const preferences = generatePreferences = (utilityMapping, possibleStates)
   return ''
 }
 

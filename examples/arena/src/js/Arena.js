@@ -5,20 +5,25 @@ var RL = require('./rl.js');
 
 const action_mapping = ['up', 'down', 'left', 'right'];
 const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const RLEnv = {
+  getNumStates: function() { return 402; },
+  getMaxNumActions: function() { return 4; }
+};
 
 /* desires */
 const desires_rl = {
   ...Desire('go', beliefs => {
 
-    console.log("reward", beliefs.reward);
+    // before we have not issued any command, there is no reward (only for first iteration)
     if (!Array.isArray(beliefs.reward)) {
       beliefs.policy.learn(beliefs.reward);
     }
 
     var state = beliefs.fullGridWorld.map(field => field_mapping[field]);
     // mark agents' positions
-    state[beliefs.positions[0]] = 4;
-    state[beliefs.positions[1]] = 5;
+    state[beliefs.position] = 4;
+    //state[beliefs.positions[0]] = 4;
+    //state[beliefs.positions[1]] = 5;
     state.push(beliefs.health);
     state.push(beliefs.coins);
 
@@ -90,23 +95,22 @@ const determineNeighborStates = (position, state) => ({
  dynamically generate agents that are aware of their own position and the types of neighboring
  fields
 */
-const generateAgents = initialState => initialState.positions.map((position, index) => {
-  // TODO This does not actually belong here
-  var env = {};
-  env.getNumStates = function() { return 402; }
-  env.getMaxNumActions = function() { return 4; }
+const generateAgents = initialState => initialState.positions.map((position, index) => generateAgent(position, index, initialState))
 
-  // Deep Q-Learning with a neural net function approximation;
-  // for gridworld a convnet could be more efficient, but not supported in reinforcejs
-  var spec = { alpha: 0.01, epsilon: 0.2, num_hidden_units: 64 }
-  var policy = new RL.DQNAgent(env, spec);                                           
+function generateAgent(position, index, state) {
+  if (state.policies[index] == null) {
+    // Deep Q-Learning with a neural net function approximation;
+    // for gridworld a convnet could be more efficient, but not supported in reinforcejs; should switch to tensorflow-js later
+    var spec = { alpha: 0.01, epsilon: 0.2, num_hidden_units: 64 } // TODO Exploration scheduling
+    state.policies[index] = new RL.DQNAgent(RLEnv, spec);
+  }                                    
 
   const beliefs = {
-    ...Belief('neighborStates', determineNeighborStates(position, initialState)),
+    ...Belief('neighborStates', determineNeighborStates(position, state)),
     ...Belief('position', position),
     ...Belief('health', 100),
     ...Belief('coins', 0),
-    ...Belief('policy', policy)
+    ...Belief('policy', state.policies[index])
   }
   return new Agent(
     index,
@@ -114,7 +118,7 @@ const generateAgents = initialState => initialState.positions.map((position, ind
     desires_rl,
     plans
   )
-})
+}
 
 /* generate pseudo-random initial state */
 const generateInitialState = (numberAgents = 2) => {
@@ -142,8 +146,9 @@ const generateInitialState = (numberAgents = 2) => {
     health: Array(numberAgents).fill(100),
     fields,
     rewards: Array(numberAgents).fill([]),
-    agents: Array(numberAgents).fill(Object),
-    rewards_acc: Array(numberAgents).fill(0)
+    rewards_acc: Array(numberAgents).fill(0),
+    policies: Array(numberAgents).fill(undefined),
+    iterations: 0
   }
 }
 
@@ -211,7 +216,6 @@ const generateConsequence = (state, agentId, newPosition) => {
         state.rewards[agentId] = -1
       } else {
         state.positions[agentId] = newPosition
-        //state.rewards[agentId] = -0.1
       }
       break
     case 'diamond':
@@ -225,7 +229,10 @@ const generateConsequence = (state, agentId, newPosition) => {
       state.rewards[agentId] = 1
       break
     case 'repair':
-      if (state.health[agentId] < 10) state.health[agentId] = state.health[agentId] + 10
+      if (state.health[agentId] < 100) { 
+        state.health[agentId] = Math.min(state.health[agentId] + 10, 100)
+        state.rewards[agentId] = 1
+      }
       const healthDamage = genRandInt(1, 5)
       if (agentId === '1') {
         state.health[0] = state.health[0] - healthDamage
@@ -238,14 +245,41 @@ const generateConsequence = (state, agentId, newPosition) => {
           state.positions[1] = undefined
         }
       }
-      state.rewards[agentId] = 1
+      
       break
   }
-  /*if (agentId === '1') {
-    state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
-    state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
-  }*/
+  if (agentId === '1') {
+    //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
+    //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
+
+    Object.keys(state.positions).filter(key => state.positions[key] == null).forEach(deadAgentId => {
+      console.log("dead ", deadAgentId);
+      var plainFields = Object.keys(state.fields).filter(
+        key => state.fields[key] === 'plain'
+      )
+      var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+      state.positions[deadAgentId] = newPosition;
+      state.health[deadAgentId] = 100;
+      state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
+    })
+
+    state.iterations = state.iterations + 1
+
+    // TODO Every 1000 steps, reset the agents to new positions
+    /*if (state.iterations % 1000 == 0) {
+      console.log("reset positions");
+      Object.keys(state.positions).forEach(resetAgentId => {
+        var plainFields = Object.keys(state.fields).filter(
+          key => state.fields[key] === 'plain'
+        )
+        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+        state.positions[resetAgentId] = newPosition;
+      })
+    }*/
+  }
+
   state.rewards_acc[agentId] = state.rewards_acc[agentId] + state.rewards[agentId]
+
   return state
 }
 

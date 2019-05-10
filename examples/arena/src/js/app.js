@@ -30,7 +30,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
           arena = Arena()
         } else {
           arena.run(1)
-          console.log(arena)
+          //console.log(arena)
           $$('#arena-grid').html(arena.render(arena.state))
           $$('#analysis').html(`
             <table>
@@ -53,7 +53,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
             </table>
           `)
         }
-      }, 500)
+      }, 250)
     })
   },
   // App routes

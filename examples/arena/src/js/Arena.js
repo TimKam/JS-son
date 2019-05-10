@@ -6,7 +6,7 @@ var RL = require('./rl.js');
 const action_mapping = ['up', 'down', 'left', 'right'];
 const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
 const RLEnv = {
-  getNumStates: function() { return 402; },
+  getNumStates: function() { return 404; },
   getMaxNumActions: function() { return 4; }
 };
 
@@ -19,16 +19,15 @@ const desires_rl = {
       beliefs.policy.learn(beliefs.reward);
     }
 
-    var state = beliefs.fullGridWorld.map(field => field_mapping[field]);
-    // mark agents' positions
-    state[beliefs.position] = 4;
-    //state[beliefs.positions[0]] = 4;
-    //state[beliefs.positions[1]] = 5;
-    state.push(beliefs.health);
-    state.push(beliefs.coins);
+    var state_vec = beliefs.fullGridWorld.map(field => field_mapping[field]);
+    state_vec[beliefs.positions[0]] = 4;
+    state_vec[beliefs.positions[1]] = 5;
+    state_vec.push(beliefs.health);
+    state_vec.push(beliefs.coins);
+    state_vec.push(beliefs.partnerHealth);
+    state_vec.push(beliefs.partnerCoins);
 
-    var a = beliefs.policy.act(state);
-    
+    const a = beliefs.policy.act(state_vec);
     return action_mapping[a];
   })
 }
@@ -288,34 +287,38 @@ const generateConsequence = (state, agentId, newPosition) => {
       break
   }
   if (agentId === '1') {
-    console.log(arena.state.health)
     //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
     //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
 
-    Object.keys(state.positions).filter(key => state.positions[key] == null).forEach(deadAgentId => {
-      console.log("dead ", deadAgentId);
-      var plainFields = Object.keys(state.fields).filter(
-        key => state.fields[key] === 'plain'
-      )
-      var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-      state.positions[deadAgentId] = newPosition;
-      state.health[deadAgentId] = 100;
-      state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
-    })
-
     state.iterations = state.iterations + 1
 
-    // TODO Every 1000 steps, reset the agents to new positions
-    /*if (state.iterations % 1000 == 0) {
+    if (state.iterations % 100 == 0) {
+      console.log(state.iterations, "steps completed");
+    }
+
+    if (state.iterations % 500 == 0) {
       console.log("reset positions");
-      Object.keys(state.positions).forEach(resetAgentId => {
+
+      for (var i = 0; i < 2; i++) {
         var plainFields = Object.keys(state.fields).filter(
           key => state.fields[key] === 'plain'
         )
         var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-        state.positions[resetAgentId] = newPosition;
-      })
-    }*/
+        state.positions[i] = newPosition;
+      }
+    }
+  }
+
+  for (var deadAgentId = 0; deadAgentId < 2; deadAgentId++) {
+    if (state.positions[deadAgentId] == null) {
+        var plainFields = Object.keys(state.fields).filter(
+          key => state.fields[key] === 'plain'
+        )
+        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+        state.positions[deadAgentId] = newPosition;
+        state.health[deadAgentId] = 100;
+        state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
+    }
   }
 
   state.rewards_acc[agentId] = state.rewards_acc[agentId] + state.rewards[agentId]
@@ -353,6 +356,8 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   ...agentBeliefs,
   coins: state.coins[agentId],
   health: state.health[agentId],
+  partnerCoins: state.coins[1-agentId],
+  partnerHealth: state.health[1-agentId],
   neighborStates: determineNeighborStates(state.positions[agentId], state),
   fullGridWorld: state.fields, // fully observable,
   positions: state.positions,

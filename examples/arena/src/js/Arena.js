@@ -1,8 +1,39 @@
 // import js-son and assign Belief, Plan, Agent, GridWorld, and FieldType to separate consts
 import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
 
+var RL = require('./rl.js');
+
+const action_mapping = ['up', 'down', 'left', 'right'];
+const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const RLEnv = {
+  getNumStates: function() { return 402; },
+  getMaxNumActions: function() { return 4; }
+};
+
 /* desires */
-const desires = {
+const desires_rl = {
+  ...Desire('go', beliefs => {
+
+    // before we have not issued any command, there is no reward (only for first iteration)
+    if (!Array.isArray(beliefs.reward)) {
+      beliefs.policy.learn(beliefs.reward);
+    }
+
+    var state = beliefs.fullGridWorld.map(field => field_mapping[field]);
+    // mark agents' positions
+    state[beliefs.position] = 4;
+    //state[beliefs.positions[0]] = 4;
+    //state[beliefs.positions[1]] = 5;
+    state.push(beliefs.health);
+    state.push(beliefs.coins);
+
+    var a = beliefs.policy.act(state);
+    
+    return action_mapping[a];
+  })
+}
+
+const desires_greedy = {
   ...Desire('go', beliefs => { // states by keys index: 0: up, 1: down, 2: left, 3: right
     if (Math.random() < 0.25) { // random exploration
       return Object.keys(beliefs.neighborStates)[Math.floor(Math.random() * 4)]
@@ -64,20 +95,30 @@ const determineNeighborStates = (position, state) => ({
  dynamically generate agents that are aware of their own position and the types of neighboring
  fields
 */
-const generateAgents = initialState => initialState.positions.map((position, index) => {
+const generateAgents = initialState => initialState.positions.map((position, index) => generateAgent(position, index, initialState))
+
+function generateAgent(position, index, state) {
+  if (state.policies[index] == null) {
+    // Deep Q-Learning with a neural net function approximation;
+    // for gridworld a convnet could be more efficient, but not supported in reinforcejs; should switch to tensorflow-js later
+    var spec = { alpha: 0.01, epsilon: 0.2, num_hidden_units: 64 } // TODO Exploration scheduling
+    state.policies[index] = new RL.DQNAgent(RLEnv, spec);
+  }                                    
+
   const beliefs = {
-    ...Belief('neighborStates', determineNeighborStates(position, initialState)),
+    ...Belief('neighborStates', determineNeighborStates(position, state)),
     ...Belief('position', position),
     ...Belief('health', 100),
-    ...Belief('coins', 0)
+    ...Belief('coins', 0),
+    ...Belief('policy', state.policies[index])
   }
   return new Agent(
     index,
     beliefs,
-    desires,
+    desires_rl,
     plans
   )
-})
+}
 
 /* generate pseudo-random initial state */
 const generateInitialState = (numberAgents = 2) => {
@@ -104,7 +145,10 @@ const generateInitialState = (numberAgents = 2) => {
     coins: Array(numberAgents).fill(0),
     health: Array(numberAgents).fill(100),
     fields,
-    rewards: Array(numberAgents).fill([])
+    rewards: Array(numberAgents).fill([]),
+    rewards_acc: Array(numberAgents).fill(0),
+    policies: Array(numberAgents).fill(undefined),
+    iterations: 0
   }
 }
 
@@ -150,12 +194,11 @@ const generateReward = (state, agentId, newPosition) => {
   }
   const fieldMovedToSelf = ''
   const fieldMovedToOther = ''
-
-  const preferences = generatePreferences = (utilityMapping, possibleStates)
   return ''
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
+  state.rewards[agentId] = 0
   switch (state.fields[newPosition]) {
     case 'plain':
       if (state.positions.includes(newPosition)) {
@@ -174,6 +217,7 @@ const generateConsequence = (state, agentId, newPosition) => {
         if (state.health[agentId] <= 0) {
           state.positions[agentId] = undefined
         }
+        state.rewards[agentId] = -1
       } else {
         state.positions[agentId] = newPosition
       }
@@ -186,9 +230,13 @@ const generateConsequence = (state, agentId, newPosition) => {
       } else {
         state.coins[1] = state.coins[1] - coinDamage
       }
+      state.rewards[agentId] = 1
       break
     case 'repair':
-      if (state.health[agentId] < 10) state.health[agentId] = state.health[agentId] + 10
+      if (state.health[agentId] < 100) { 
+        state.health[agentId] = Math.min(state.health[agentId] + 10, 100)
+        state.rewards[agentId] = 1
+      }
       const healthDamage = genRandInt(1, 5)
       if (agentId === '1') {
         state.health[0] = state.health[0] - healthDamage
@@ -201,12 +249,41 @@ const generateConsequence = (state, agentId, newPosition) => {
           state.positions[1] = undefined
         }
       }
+      
       break
   }
   if (agentId === '1') {
-    state.rewards[0].push(generateReward(state, 0, state.fields[newPosition]))
-    state.rewards[1].push(generateReward(state, 1, state.fields[newPosition]))
+    //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
+    //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
+
+    Object.keys(state.positions).filter(key => state.positions[key] == null).forEach(deadAgentId => {
+      console.log("dead ", deadAgentId);
+      var plainFields = Object.keys(state.fields).filter(
+        key => state.fields[key] === 'plain'
+      )
+      var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+      state.positions[deadAgentId] = newPosition;
+      state.health[deadAgentId] = 100;
+      state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
+    })
+
+    state.iterations = state.iterations + 1
+
+    // TODO Every 1000 steps, reset the agents to new positions
+    /*if (state.iterations % 1000 == 0) {
+      console.log("reset positions");
+      Object.keys(state.positions).forEach(resetAgentId => {
+        var plainFields = Object.keys(state.fields).filter(
+          key => state.fields[key] === 'plain'
+        )
+        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+        state.positions[resetAgentId] = newPosition;
+      })
+    }*/
   }
+
+  state.rewards_acc[agentId] = state.rewards_acc[agentId] + state.rewards[agentId]
+
   return state
 }
 
@@ -241,7 +318,9 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   coins: state.coins[agentId],
   health: state.health[agentId],
   neighborStates: determineNeighborStates(state.positions[agentId], state),
-  fullGridWorld: state.positions // fully observable
+  fullGridWorld: state.fields, // fully observable,
+  positions: state.positions,
+  reward: state.rewards[agentId]
 })
 
 const fieldTypes = {

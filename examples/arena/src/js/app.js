@@ -30,7 +30,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
           arena = Arena()
         } else {
           arena.run(1)
-          console.log(arena)
+          //console.log(arena)
           $$('#arena-grid').html(arena.render(arena.state))
           $$('#analysis').html(`
             <table>
@@ -46,10 +46,14 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
                 <td><strong>Coins</strong></td>
                 ${arena.state.coins.map(coins => `<td>${coins}</td>`).join('')}
               </tr>
+              <tr>
+                <td><strong>Total Rewards</strong></td>
+                ${arena.state.rewards_acc.map(r => `<td>${r}</td>`).join('')}
+              </tr>
             </table>
           `)
         }
-      }, 2000)
+      }, 250)
     })
   },
   // App routes

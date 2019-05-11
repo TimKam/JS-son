@@ -1,3 +1,4 @@
+import Plotly from 'plotly.js-dist'
 import $$ from 'dom7'
 import Framework7 from 'framework7/framework7.esm.bundle.js'
 import 'framework7/css/framework7.bundle.css'
@@ -10,6 +11,9 @@ import routes from './routes.js'
 import Arena from './Arena'
 
 window.arena = undefined
+
+// rewards
+const rewards = [[], []]
 
 var app = new Framework7({ // eslint-disable-line no-unused-vars
   root: '#app', // App root element
@@ -30,7 +34,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
           arena = Arena()
         } else {
           arena.run(1)
-          //console.log(arena)
+          // console.log(arena)
           $$('#arena-grid').html(arena.render(arena.state))
           $$('#analysis').html(`
             <table>
@@ -48,10 +52,27 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
               </tr>
               <tr>
                 <td><strong>Total Rewards</strong></td>
-                ${arena.state.rewards_acc.map(r => `<td>${r}</td>`).join('')}
+                ${arena.state.rewardsAcc.map(r => `<td>${r}</td>`).join('')}
               </tr>
             </table>
+            <div id="reward-plot"></div>
           `)
+          rewards[0].push(arena.state.rewardsAcc[0])
+          rewards[1].push(arena.state.rewardsAcc[1])
+          const trace1 = {
+            x: Array.apply(null, { length: rewards[0].length }).map(Number.call, Number),
+            y: rewards[0],
+            type: 'scatter',
+            name: 'agent 0'
+          }
+          const trace2 = {
+            x: Array.apply(null, { length: rewards[1].length }).map(Number.call, Number),
+            y: rewards[1],
+            type: 'scatter',
+            name: 'agent 1'
+          }
+          const data = [trace1, trace2]
+          Plotly.newPlot('reward-plot', data, { title: 'Rewards' })
         }
       }, 250)
     })

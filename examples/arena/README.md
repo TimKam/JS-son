@@ -1,7 +1,6 @@
 # JS-son Arena - A Multi-Agent Grid World
 
-This tutorial describes how to use **JS-son** to implement a simple multi-agent grid world.
-The example application is available online at [https://people.cs.umu.se/~tkampik/demos/arena/](https://people.cs.umu.se/~tkampik/demos/arena/).
+**Note: This tutorial does not describe the actual source code of this example, but rather how to implement a basic grid world with JS-son. The paper that document this preliminary example of JS-son for learning agents is currently under review.**
 
 ## Use Case
 The tutorial describes the implementation of a 20 x 20 grid world.

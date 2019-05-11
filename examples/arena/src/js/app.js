@@ -20,7 +20,7 @@ let regretIterator = 0
 var app = new Framework7({ // eslint-disable-line no-unused-vars
   root: '#app', // App root element
 
-  name: 'JS-son: Game of Life', // App name
+  name: 'JS-son: Arena', // App name
   theme: 'auto', // Automatic theme detection
   // App root data
   data: () => {

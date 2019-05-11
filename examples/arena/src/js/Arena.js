@@ -1,10 +1,13 @@
 // import js-son and assign Belief, Plan, Agent, GridWorld, and FieldType to separate consts
 import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
+import ContactsListComponent from 'framework7/components/contacts-list/contacts-list';
 
 var RL = require('./rl.js');
 
 const action_mapping = ['up', 'down', 'left', 'right'];
 const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const field_own_effects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth'};
+const field_partner_effects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth'};
 const RLEnv = {
   getNumStates: function() { return 404; },
   getMaxNumActions: function() { return 4; }
@@ -29,7 +32,43 @@ const desires_rl = {
 
     const a = beliefs.policy.act(state_vec);
     return action_mapping[a];
+  }),
+  ...Desire('preferences', beliefs => {
+    const ownPreferences = generatePreferences(beliefs.health);
+
+    const partnerId = 1-beliefs.agentId;
+    const partnerStates = determineNeighborStates(beliefs.positions[partnerId], beliefs.fullGridWorld)
+
+    var prefs = {};
+
+    Object.keys(beliefs.neighborStates).filter(key => beliefs.neighborStates[key]).forEach(ownKey => {
+      const ownEffect = field_own_effects[beliefs.neighborStates[ownKey]];
+
+      Object.keys(beliefs.neighborStates).filter(key => partnerStates[key]).forEach(partnerKey => {
+        const partnerEffect = field_partner_effects[partnerStates[partnerKey]];
+        
+        let actionCombination;
+        if (beliefs.agentId === '0') {
+          actionCombination = ownKey + capitalize(partnerKey);
+        } else {
+          actionCombination = partnerKey + capitalize(ownKey);
+        }
+
+        const combinedEffect = ownEffect + partnerEffect;
+        prefs[actionCombination] = ownPreferences.indexOf(combinedEffect);
+        if (ownPreferences.indexOf(combinedEffect) < 0) {
+          console.log(actionCombination, combinedEffect);
+        }
+      });
+    });
+    //console.log(prefs);
+    return prefs;
   })
+}
+
+const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 const desires_greedy = {
@@ -84,11 +123,11 @@ const plans = [
 ]
 
 /* helper function to determine the field types of an agent's neighbor fields */
-const determineNeighborStates = (position, state) => ({
-  up: position + 20 >= 400 ? undefined : state.fields[position + 20],
-  down: position - 20 < 0 ? undefined : state.fields[position - 20],
-  left: position % 20 === 0 ? undefined : state.fields[position - 1],
-  right: position % 20 === 1 ? undefined : state.fields[position + 1]
+const determineNeighborStates = (position, fields) => ({
+  up: position + 20 >= 400 ? undefined : fields[position + 20],
+  down: position - 20 < 0 ? undefined : fields[position - 20],
+  left: position % 20 === 0 ? undefined : fields[position - 1],
+  right: position % 20 === 1 ? undefined : fields[position + 1]
 })
 /*
  dynamically generate agents that are aware of their own position and the types of neighboring
@@ -105,11 +144,12 @@ function generateAgent(position, index, state) {
   }                                    
 
   const beliefs = {
-    ...Belief('neighborStates', determineNeighborStates(position, state)),
+    ...Belief('neighborStates', determineNeighborStates(position, state.fields)),
     ...Belief('position', position),
     ...Belief('health', 100),
     ...Belief('coins', 0),
-    ...Belief('policy', state.policies[index])
+    ...Belief('policy', state.policies[index]),
+    ...Belief('agentId', index)
   }
   return new Agent(
     index,
@@ -161,40 +201,31 @@ const generateProfiles = () => {
 
 }
 
-const generatePreferences = (agentId, availableProfiles) => {
-  let genericPreferenceMapping
-  if (arena.state[agentId].health > 30) {
-    genericPreferenceMapping = [
-      'GetCoins',
-      'GetCoinsLoseHealth',
-      'GetHealth',
-      'Nothing',
-      'LoseHealth',
-      'LoseCoinsGetHealth',
-      'LoseCoins',
-      'LoseCoinsLoseHealth',
-      'Die'
-    ]
+const generatePreferences = (health) => {
+  let preferenceOrder;
+  if (health > 30) {
+    preferenceOrder = ['GetCoins', 'GetHealth', 'Nothing', 'LoseHealth', 'LoseCoins'];
   } else {
-    genericPreferenceMapping = [
-      'GetHealth',
-      'LoseCoinsGetHealth',
-      'GetCoins',
-      'Nothing',
-      'LoseCoins',
-      'GetCoinsLoseHealth',
-      'LoseHealth',
-      'LoseCoinsLoseHealth',
-      'Die'
-    ]
+    preferenceOrder = ['GetHealth', 'GetCoins', 'Nothing', 'LoseCoins', 'LoseHealth'];
   }
 
-  return genericPreferenceMapping.filter(
+  var genericPreferenceMapping = []
+
+  preferenceOrder.forEach(myPref => {
+    preferenceOrder.forEach(otherPref => {
+      genericPreferenceMapping.push(myPref + otherPref);
+    })
+  });
+
+  //console.log(genericPreferenceMapping);
+
+  return genericPreferenceMapping;
+  /*return genericPreferenceMapping.filter(
     consequence =>
       Object.keys(availableProfiles).some(profileConsequence =>
         profileConsequence === consequence
       )
-  ).map(consequence => availableProfiles[consequence])
+  ).map(consequence => availableProfiles[consequence])*/
 }
 
 /*
@@ -394,7 +425,7 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   health: state.health[agentId],
   partnerCoins: state.coins[1-agentId],
   partnerHealth: state.health[1-agentId],
-  neighborStates: determineNeighborStates(state.positions[agentId], state),
+  neighborStates: determineNeighborStates(state.positions[agentId], state.fields),
   fullGridWorld: state.fields, // fully observable,
   positions: state.positions,
   reward: state.rewards[agentId]

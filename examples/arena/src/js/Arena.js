@@ -4,10 +4,10 @@ import ContactsListComponent from 'framework7/components/contacts-list/contacts-
 
 var RL = require('./rl.js');
 
-const action_mapping = ['up', 'down', 'left', 'right'];
-const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
-const field_own_effects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth'};
-const field_partner_effects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth'};
+const actionMapping = ['up', 'down', 'left', 'right'];
+const fieldMapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const fieldOwnEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth'};
+const fieldPartnerEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth'};
 const RLEnv = {
   getNumStates: function() { return 404; },
   getMaxNumActions: function() { return 4; }
@@ -22,16 +22,16 @@ const desires_rl = {
       beliefs.policy.learn(beliefs.reward);
     }
 
-    var state_vec = beliefs.fullGridWorld.map(field => field_mapping[field]);
-    state_vec[beliefs.positions[0]] = 4;
-    state_vec[beliefs.positions[1]] = 5;
-    state_vec.push(beliefs.health);
-    state_vec.push(beliefs.coins);
-    state_vec.push(beliefs.partnerHealth);
-    state_vec.push(beliefs.partnerCoins);
+    var stateVector = beliefs.fullGridWorld.map(field => fieldMapping[field]);
+    stateVector[beliefs.positions[0]] = 4;
+    stateVector[beliefs.positions[1]] = 5;
+    stateVector.push(beliefs.health);
+    stateVector.push(beliefs.coins);
+    stateVector.push(beliefs.partnerHealth);
+    stateVector.push(beliefs.partnerCoins);
 
-    const a = beliefs.policy.act(state_vec);
-    return action_mapping[a];
+    const a = beliefs.policy.act(stateVector);
+    return actionMapping[a];
   }),
   ...Desire('preferences', beliefs => {
     const ownPreferences = generatePreferences(beliefs.health);
@@ -42,10 +42,10 @@ const desires_rl = {
     var prefs = {};
 
     Object.keys(beliefs.neighborStates).filter(key => beliefs.neighborStates[key]).forEach(ownKey => {
-      const ownEffect = field_own_effects[beliefs.neighborStates[ownKey]];
+      const ownEffect = fieldOwnEffects[beliefs.neighborStates[ownKey]];
 
       Object.keys(beliefs.neighborStates).filter(key => partnerStates[key]).forEach(partnerKey => {
-        const partnerEffect = field_partner_effects[partnerStates[partnerKey]];
+        const partnerEffect = fieldPartnerEffects[partnerStates[partnerKey]];
         
         let actionCombination;
         if (beliefs.agentId === '0') {
@@ -64,11 +64,6 @@ const desires_rl = {
     //console.log(prefs);
     return prefs;
   })
-}
-
-const capitalize = (s) => {
-  if (typeof s !== 'string') return '';
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 const desires_greedy = {
@@ -195,6 +190,11 @@ const genRandInt = (min, max) => {
   min = Math.ceil(min)
   max = Math.floor(max)
   return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 const generateProfiles = () => {

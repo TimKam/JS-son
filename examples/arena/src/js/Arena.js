@@ -1,12 +1,15 @@
 // import js-son and assign Belief, Plan, Agent, GridWorld, and FieldType to separate consts
 import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
+import ContactsListComponent from 'framework7/components/contacts-list/contacts-list';
 
 var RL = require('./rl.js');
 
-const action_mapping = ['up', 'down', 'left', 'right'];
-const field_mapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const actionMapping = ['up', 'down', 'left', 'right'];
+const fieldMapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
+const fieldOwnEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth'};
+const fieldPartnerEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth'};
 const RLEnv = {
-  getNumStates: function() { return 402; },
+  getNumStates: function() { return 404; },
   getMaxNumActions: function() { return 4; }
 };
 
@@ -19,17 +22,47 @@ const desires_rl = {
       beliefs.policy.learn(beliefs.reward);
     }
 
-    var state = beliefs.fullGridWorld.map(field => field_mapping[field]);
-    // mark agents' positions
-    state[beliefs.position] = 4;
-    //state[beliefs.positions[0]] = 4;
-    //state[beliefs.positions[1]] = 5;
-    state.push(beliefs.health);
-    state.push(beliefs.coins);
+    var stateVector = beliefs.fullGridWorld.map(field => fieldMapping[field]);
+    stateVector[beliefs.positions[0]] = 4;
+    stateVector[beliefs.positions[1]] = 5;
+    stateVector.push(beliefs.health);
+    stateVector.push(beliefs.coins);
+    stateVector.push(beliefs.partnerHealth);
+    stateVector.push(beliefs.partnerCoins);
 
-    var a = beliefs.policy.act(state);
-    
-    return action_mapping[a];
+    const a = beliefs.policy.act(stateVector);
+    return actionMapping[a];
+  }),
+  ...Desire('preferences', beliefs => {
+    const ownPreferences = generatePreferences(beliefs.health);
+
+    const partnerId = 1-beliefs.agentId;
+    const partnerStates = determineNeighborStates(beliefs.positions[partnerId], beliefs.fullGridWorld)
+
+    var prefs = {};
+
+    Object.keys(beliefs.neighborStates).filter(key => beliefs.neighborStates[key]).forEach(ownKey => {
+      const ownEffect = fieldOwnEffects[beliefs.neighborStates[ownKey]];
+
+      Object.keys(beliefs.neighborStates).filter(key => partnerStates[key]).forEach(partnerKey => {
+        const partnerEffect = fieldPartnerEffects[partnerStates[partnerKey]];
+        
+        let actionCombination;
+        if (beliefs.agentId === '0') {
+          actionCombination = ownKey + capitalize(partnerKey);
+        } else {
+          actionCombination = partnerKey + capitalize(ownKey);
+        }
+
+        const combinedEffect = ownEffect + partnerEffect;
+        prefs[actionCombination] = ownPreferences.indexOf(combinedEffect);
+        if (ownPreferences.indexOf(combinedEffect) < 0) {
+          console.log(actionCombination, combinedEffect);
+        }
+      });
+    });
+    //console.log(prefs);
+    return prefs;
   })
 }
 
@@ -85,11 +118,11 @@ const plans = [
 ]
 
 /* helper function to determine the field types of an agent's neighbor fields */
-const determineNeighborStates = (position, state) => ({
-  up: position + 20 >= 400 ? undefined : state.fields[position + 20],
-  down: position - 20 < 0 ? undefined : state.fields[position - 20],
-  left: position % 20 === 0 ? undefined : state.fields[position - 1],
-  right: position % 20 === 1 ? undefined : state.fields[position + 1]
+const determineNeighborStates = (position, fields) => ({
+  up: position + 20 >= 400 ? undefined : fields[position + 20],
+  down: position - 20 < 0 ? undefined : fields[position - 20],
+  left: position % 20 === 0 ? undefined : fields[position - 1],
+  right: position % 20 === 1 ? undefined : fields[position + 1]
 })
 /*
  dynamically generate agents that are aware of their own position and the types of neighboring
@@ -106,11 +139,12 @@ function generateAgent(position, index, state) {
   }                                    
 
   const beliefs = {
-    ...Belief('neighborStates', determineNeighborStates(position, state)),
+    ...Belief('neighborStates', determineNeighborStates(position, state.fields)),
     ...Belief('position', position),
     ...Belief('health', 100),
     ...Belief('coins', 0),
-    ...Belief('policy', state.policies[index])
+    ...Belief('policy', state.policies[index]),
+    ...Belief('agentId', index)
   }
   return new Agent(
     index,
@@ -158,44 +192,40 @@ const genRandInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 const generateProfiles = () => {
 
 }
 
-const generatePreferences = (agentId, availableProfiles) => {
-  let genericPreferenceMapping
-  if (arena.state[agentId].health > 30) {
-    genericPreferenceMapping = [
-      'GetCoins',
-      'GetCoinsLoseHealth',
-      'GetHealth',
-      'Nothing',
-      'LoseHealth',
-      'LoseCoinsGetHealth',
-      'LoseCoins',
-      'LoseCoinsLoseHealth',
-      'Die'
-    ]
+const generatePreferences = (health) => {
+  let preferenceOrder;
+  if (health > 30) {
+    preferenceOrder = ['GetCoins', 'GetHealth', 'Nothing', 'LoseHealth', 'LoseCoins'];
   } else {
-    genericPreferenceMapping = [
-      'GetHealth',
-      'LoseCoinsGetHealth',
-      'GetCoins',
-      'Nothing',
-      'LoseCoins',
-      'GetCoinsLoseHealth',
-      'LoseHealth',
-      'LoseCoinsLoseHealth',
-      'Die'
-    ]
+    preferenceOrder = ['GetHealth', 'GetCoins', 'Nothing', 'LoseCoins', 'LoseHealth'];
   }
 
-  return genericPreferenceMapping.filter(
+  var genericPreferenceMapping = []
+
+  preferenceOrder.forEach(myPref => {
+    preferenceOrder.forEach(otherPref => {
+      genericPreferenceMapping.push(myPref + otherPref);
+    })
+  });
+
+  //console.log(genericPreferenceMapping);
+
+  return genericPreferenceMapping;
+  /*return genericPreferenceMapping.filter(
     consequence =>
       Object.keys(availableProfiles).some(profileConsequence =>
         profileConsequence === consequence
       )
-  ).map(consequence => availableProfiles[consequence])
+  ).map(consequence => availableProfiles[consequence])*/
 }
 
 /*
@@ -267,7 +297,9 @@ const generateReward = (state, agentId, newPosition) => {
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
-  state.rewards[agentId] = 0
+  state.rewards[agentId] = 0;
+  state.health[agentId] = state.health[agentId] - 1;
+
   switch (state.fields[newPosition]) {
     case 'plain':
       if (state.positions.includes(newPosition)) {
@@ -322,34 +354,38 @@ const generateConsequence = (state, agentId, newPosition) => {
       break
   }
   if (agentId === '1') {
-    console.log(arena.state.health)
     //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
     //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
 
-    Object.keys(state.positions).filter(key => state.positions[key] == null).forEach(deadAgentId => {
-      console.log("dead ", deadAgentId);
-      var plainFields = Object.keys(state.fields).filter(
-        key => state.fields[key] === 'plain'
-      )
-      var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-      state.positions[deadAgentId] = newPosition;
-      state.health[deadAgentId] = 100;
-      state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
-    })
-
     state.iterations = state.iterations + 1
 
-    // TODO Every 1000 steps, reset the agents to new positions
-    /*if (state.iterations % 1000 == 0) {
+    if (state.iterations % 100 == 0) {
+      console.log(state.iterations, "steps completed");
+    }
+
+    if (state.iterations % 500 == 0) {
       console.log("reset positions");
-      Object.keys(state.positions).forEach(resetAgentId => {
+
+      for (var i = 0; i < 2; i++) {
         var plainFields = Object.keys(state.fields).filter(
           key => state.fields[key] === 'plain'
         )
         var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-        state.positions[resetAgentId] = newPosition;
-      })
-    }*/
+        state.positions[i] = newPosition;
+      }
+    }
+  }
+
+  for (var deadAgentId = 0; deadAgentId < 2; deadAgentId++) {
+    if (state.positions[deadAgentId] == null) {
+        var plainFields = Object.keys(state.fields).filter(
+          key => state.fields[key] === 'plain'
+        )
+        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
+        state.positions[deadAgentId] = newPosition;
+        state.health[deadAgentId] = 100;
+        state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
+    }
   }
 
   state.rewards_acc[agentId] = state.rewards_acc[agentId] + state.rewards[agentId]
@@ -387,7 +423,9 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   ...agentBeliefs,
   coins: state.coins[agentId],
   health: state.health[agentId],
-  neighborStates: determineNeighborStates(state.positions[agentId], state),
+  partnerCoins: state.coins[1-agentId],
+  partnerHealth: state.health[1-agentId],
+  neighborStates: determineNeighborStates(state.positions[agentId], state.fields),
   fullGridWorld: state.fields, // fully observable,
   positions: state.positions,
   reward: state.rewards[agentId]

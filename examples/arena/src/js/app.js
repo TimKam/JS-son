@@ -57,7 +57,6 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
                 ${arena.state.rewardsAcc.map(r => `<td>${r}</td>`).join('')}
               </tr>
             </table>
-            <div id="reward-plot"></div>
           `)
           rewards[0].push(arena.state.rewards[0])
           rewards[1].push(arena.state.rewards[1])

@@ -14,6 +14,8 @@ window.arena = undefined
 
 // rewards
 const rewards = [[], []]
+const rewardsSliding = [[], []]
+let regretIterator = 0
 
 var app = new Framework7({ // eslint-disable-line no-unused-vars
   root: '#app', // App root element
@@ -57,22 +59,24 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
             </table>
             <div id="reward-plot"></div>
           `)
-          rewards[0].push(arena.state.rewardsAcc[0])
-          rewards[1].push(arena.state.rewardsAcc[1])
+          rewards[0].push(arena.state.rewards[0])
+          rewards[1].push(arena.state.rewards[1])
+          if (regretIterator < 10) {
+            regretIterator++
+            return
+          }
+          rewardsSliding[0].push(
+            rewards[0].slice(rewards[0].length - 10).reduce((partialSum, a) => partialSum + a, 0) / 10
+          )
+          rewardsSliding[1].push(
+            rewards[0].slice(rewards[1].length - 10).reduce((partialSum, a) => partialSum + a, 0) / 10
+          )
           const trace1 = {
             x: Array.apply(null, { length: rewards[0].length }).map(Number.call, Number),
             y: rewards[0],
-            type: 'scatter',
-            name: 'agent 0'
+            type: 'scatter'
           }
-          const trace2 = {
-            x: Array.apply(null, { length: rewards[1].length }).map(Number.call, Number),
-            y: rewards[1],
-            type: 'scatter',
-            name: 'agent 1'
-          }
-          const data = [trace1, trace2]
-          Plotly.newPlot('reward-plot', data, { title: 'Rewards' })
+          Plotly.newPlot('reward-plot', [trace1], { title: 'Rewards: Average, Last 10 Steps' })
         }
       }, 250)
     })

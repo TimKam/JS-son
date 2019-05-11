@@ -266,7 +266,9 @@ const generateReward = (state, agentId, newPosition) => {
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
-  state.rewards[agentId] = 0
+  state.rewards[agentId] = 0;
+  state.health[agentId] = state.health[agentId] - 1;
+
   switch (state.fields[newPosition]) {
     case 'plain':
       if (state.positions.includes(newPosition)) {

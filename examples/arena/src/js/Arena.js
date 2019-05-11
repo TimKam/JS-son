@@ -158,11 +158,14 @@ const genRandInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+const generateProfiles = () => {
+
+}
+
 const generatePreferences = (agentId, availableProfiles) => {
   let genericPreferenceMapping
   if (arena.state[agentId].health > 30) {
     genericPreferenceMapping = [
-      'GetCoinsGetHealth',
       'GetCoins',
       'GetCoinsLoseHealth',
       'GetHealth',
@@ -175,7 +178,6 @@ const generatePreferences = (agentId, availableProfiles) => {
     ]
   } else {
     genericPreferenceMapping = [
-      'GetCoinsGetHealth',
       'GetHealth',
       'LoseCoinsGetHealth',
       'GetCoins',
@@ -196,37 +198,69 @@ const generatePreferences = (agentId, availableProfiles) => {
   ).map(consequence => availableProfiles[consequence])
 }
 
+/*
+  For all action sets with index1 between index1 and (including) index2:
+    index2 does not increase if index1 does not decrease lower than index2
+*/
+const isEnvyFree = (
+  preferences0,
+  preferences1,
+  index0,
+  index1
+) => preferences0.every((preference0, index) => {
+  if (index < index1 && index >= index0) {
+    if (preferences1.indexOf(preference0) > index1) {
+      return false
+    }
+  }
+  return true
+})
+
+const determineFairEquilibrium = (preferences0, preferences1) => {
+  const possibleActions = [
+    'upUp',
+    'downUp',
+    'leftUp',
+    'rightUp',
+    'upDown',
+    'downDown',
+    'leftDown',
+    'rightDown',
+    'upLeft',
+    'downLeft',
+    'leftLeft',
+    'rightLeft',
+    'upRight',
+    'downRight',
+    'leftRight',
+    'rightRight'
+  ]
+
+  let bestActionSet
+  possibleActions.forEach(actionSet => {
+    const index0 = preferences0.indexOf(actionSet)
+    const index1 = preferences1.indexOf(actionSet)
+    if (!bestActionSet && isEnvyFree(preferences0, preferences1, index0, index1)) {
+      bestActionSet = { actionSet: [index0, index1] }
+    }
+    if (
+      (index0 >= Object.keys(bestActionSet)[0][0] && index0 >= Object.keys(bestActionSet)[0][0]) && // Pareto improvement
+      (isEnvyFree(preferences0, preferences1, index0, index1)) // envy-free
+    ) {
+      bestActionSet = { actionSet: [index0, index1] }
+    }
+  })
+  return bestActionSet
+}
+
 const generateReward = (state, agentId, newPosition) => {
-  const preferences = generatePreferences()
+  const availableProfiles = generateProfiles()
+  const preferences0 = generatePreferences(0, availableProfiles)
+  const preferences1 = generatePreferences(1, availableProfiles)
+  const fairEquilibrium = determineFairEquilibrium(preferences0, preferences1)
+
   console.log('generateReward')
   console.log(arena.state.positions)
-  const utilityMapping = {
-    'diamondDiamond': 7,
-    'repairDiamond': 7,
-    'repairFullDiamond': -3,
-    'deathDiamond': -100,
-    'otherDiamond': -3,
-    'diamondRepair': 7,
-    'repairRepair': 7,
-    'repairFullRepair': -3,
-    'deathRepair': -100,
-    'otherRepair': -3,
-    'diamondRepairFull': 7,
-    'repairRepairFull': 7,
-    'repairFullRepairFull': -3,
-    'deathRepairFull': -100,
-    'otherRepairFull': -3,
-    'diamondDeath': 10,
-    'repairDeath': 10,
-    'repairFullDeath': 0,
-    'deathDeath': -100,
-    'otherDeath': 0,
-    'diamondOther': 10,
-    'repairOther': 10,
-    'repairFullOther': 0,
-    'deathOther': -100,
-    'otherOther': 0
-  }
   const fieldMovedToSelf = ''
   const fieldMovedToOther = ''
   return ''

@@ -1,100 +1,70 @@
 // import js-son and assign Belief, Plan, Agent, GridWorld, and FieldType to separate consts
 import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
-import ContactsListComponent from 'framework7/components/contacts-list/contacts-list';
 
-var RL = require('./rl.js');
+var RL = require('./rl.js')
 
-const actionMapping = ['up', 'down', 'left', 'right'];
-const fieldMapping = {'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3};
-const fieldOwnEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth'};
-const fieldPartnerEffects = {'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth'};
+const actionMapping = ['up', 'down', 'left', 'right']
+const fieldMapping = { 'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3 }
+const fieldOwnEffects = { 'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth' }
+const fieldPartnerEffects = { 'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth' }
 const RLEnv = {
-  getNumStates: function() { return 404; },
-  getMaxNumActions: function() { return 4; }
-};
-
-/* desires */
-const desires_rl = {
-  ...Desire('go', beliefs => {
-
-    // before we have not issued any command, there is no reward (only for first iteration)
-    if (!Array.isArray(beliefs.reward)) {
-      beliefs.policy.learn(beliefs.reward);
-    }
-
-    var stateVector = beliefs.fullGridWorld.map(field => fieldMapping[field]);
-    stateVector[beliefs.positions[0]] = 4;
-    stateVector[beliefs.positions[1]] = 5;
-    stateVector.push(beliefs.health);
-    stateVector.push(beliefs.coins);
-    stateVector.push(beliefs.partnerHealth);
-    stateVector.push(beliefs.partnerCoins);
-
-    const a = beliefs.policy.act(stateVector);
-    return actionMapping[a];
-  }),
-  ...Desire('preferences', beliefs => {
-    const ownPreferences = generatePreferences(beliefs.health);
-
-    const partnerId = 1-beliefs.agentId;
-    const partnerStates = determineNeighborStates(beliefs.positions[partnerId], beliefs.fullGridWorld)
-
-    var prefs = {};
-
-    Object.keys(beliefs.neighborStates).filter(key => beliefs.neighborStates[key]).forEach(ownKey => {
-      const ownEffect = fieldOwnEffects[beliefs.neighborStates[ownKey]];
-
-      Object.keys(beliefs.neighborStates).filter(key => partnerStates[key]).forEach(partnerKey => {
-        const partnerEffect = fieldPartnerEffects[partnerStates[partnerKey]];
-        
-        let actionCombination;
-        if (beliefs.agentId === '0') {
-          actionCombination = ownKey + capitalize(partnerKey);
-        } else {
-          actionCombination = partnerKey + capitalize(ownKey);
-        }
-
-        const combinedEffect = ownEffect + partnerEffect;
-        prefs[actionCombination] = ownPreferences.indexOf(combinedEffect);
-        if (ownPreferences.indexOf(combinedEffect) < 0) {
-          console.log(actionCombination, combinedEffect);
-        }
-      });
-    });
-    //console.log(prefs);
-    return prefs;
-  })
+  getNumStates: () => 404,
+  getMaxNumActions: () => 4
 }
 
-const desires_greedy = {
-  ...Desire('go', beliefs => { // states by keys index: 0: up, 1: down, 2: left, 3: right
-    if (Math.random() < 0.25) { // random exploration
-      return Object.keys(beliefs.neighborStates)[Math.floor(Math.random() * 4)]
+/* desires */
+const desiresRL = {
+  ...Desire('go', beliefs => {
+    // before we have not issued any command, there is no reward (only for first iteration)
+    if (!Array.isArray(beliefs.reward)) {
+      beliefs.policy.learn(beliefs.reward)
     }
-    const neighborsDiamond = Object.keys(beliefs.neighborStates).some(
-      key => beliefs.neighborStates[key] === 'diamond'
-    )
-    const neighborsRepair = Object.keys(beliefs.neighborStates).some(
-      key => beliefs.neighborStates[key] === 'repair'
-    )
-    const neighborsPlain = Object.keys(beliefs.neighborStates).some(
-      key => beliefs.neighborStates[key] === 'plain'
-    )
-    if (neighborsDiamond) {
-      return Object.keys(beliefs.neighborStates).find(
-        key => beliefs.neighborStates[key] === 'diamond'
-      )
-    } else if (neighborsRepair) {
-      return Object.keys(beliefs.neighborStates).find(
-        key => beliefs.neighborStates[key] === 'repair'
-      )
-    } else if (neighborsPlain) {
-      return Object.keys(beliefs.neighborStates).find(
-        key => beliefs.neighborStates[key] === 'plain'
-      )
-    } else {
-      return undefined
-    }
+
+    var stateVector = beliefs.fullGridWorld.map(field => fieldMapping[field])
+    stateVector[beliefs.positions[0]] = 4
+    stateVector[beliefs.positions[1]] = 5
+    stateVector.push(beliefs.health)
+    stateVector.push(beliefs.coins)
+    stateVector.push(beliefs.partnerHealth)
+    stateVector.push(beliefs.partnerCoins)
+
+    const a = beliefs.policy.act(stateVector)
+    return actionMapping[a]
+  }),
+  ...Desire('preferences', beliefs => {
+    const ownPreferences = generatePreferences(beliefs.health)
+
+    const partnerId = 1 - beliefs.agentId
+    const partnerStates = determineNeighborStates(beliefs.positions[partnerId], beliefs.fullGridWorld)
+
+    const prefs = {}
+
+    Object.keys(beliefs.neighborStates).filter(key => beliefs.neighborStates[key]).forEach(ownKey => {
+      const ownEffect = fieldOwnEffects[beliefs.neighborStates[ownKey]]
+
+      Object.keys(beliefs.neighborStates).filter(key => partnerStates[key]).forEach(partnerKey => {
+        const partnerEffect = fieldPartnerEffects[partnerStates[partnerKey]]
+
+        let actionCombination
+        if (beliefs.agentId === '0') {
+          actionCombination = ownKey + capitalize(partnerKey)
+        } else {
+          actionCombination = partnerKey + capitalize(ownKey)
+        }
+
+        let partnerEffectOnMe = ''
+        if (partnerEffect === 'GetHealth') partnerEffectOnMe = 'LoseHealth'
+        if (partnerEffect === 'GetCoins') partnerEffectOnMe = 'LoseCoins'
+
+        const combinedEffect = ownEffect + partnerEffectOnMe
+        prefs[actionCombination] = ownPreferences.indexOf(combinedEffect)
+        if (ownPreferences.indexOf(combinedEffect) < 0) {
+          console.log(actionCombination, combinedEffect)
+        }
+      })
+    })
+    const items = Object.keys(prefs).map(key => [key, prefs[key]])
+    return items.sort((first, second) => second[1] - first[1]).map(el => el[0])
   })
 }
 
@@ -130,13 +100,13 @@ const determineNeighborStates = (position, fields) => ({
 */
 const generateAgents = initialState => initialState.positions.map((position, index) => generateAgent(position, index, initialState))
 
-function generateAgent(position, index, state) {
+function generateAgent (position, index, state) {
   if (state.policies[index] == null) {
     // Deep Q-Learning with a neural net function approximation;
     // for gridworld a convnet could be more efficient, but not supported in reinforcejs; should switch to tensorflow-js later
     var spec = { alpha: 0.01, epsilon: 0.2, num_hidden_units: 64 } // TODO Exploration scheduling
-    state.policies[index] = new RL.DQNAgent(RLEnv, spec);
-  }                                    
+    state.policies[index] = new RL.DQNAgent(RLEnv, spec)
+  }
 
   const beliefs = {
     ...Belief('neighborStates', determineNeighborStates(position, state.fields)),
@@ -149,7 +119,7 @@ function generateAgent(position, index, state) {
   return new Agent(
     index,
     beliefs,
-    desires_rl,
+    desiresRL,
     plans
   )
 }
@@ -180,7 +150,7 @@ const generateInitialState = (numberAgents = 2) => {
     health: Array(numberAgents).fill(100),
     fields,
     rewards: Array(numberAgents).fill([]),
-    rewards_acc: Array(numberAgents).fill(0),
+    rewardsAcc: Array(numberAgents).fill(0),
     policies: Array(numberAgents).fill(undefined),
     iterations: 0
   }
@@ -192,40 +162,21 @@ const genRandInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-const capitalize = (s) => {
-  if (typeof s !== 'string') return '';
-  return s.charAt(0).toUpperCase() + s.slice(1);
+const capitalize = s => {
+  if (typeof s !== 'string') return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-const generateProfiles = () => {
-
-}
-
-const generatePreferences = (health) => {
-  let preferenceOrder;
+const generatePreferences = health => {
+  let preferenceOrder
   if (health > 30) {
-    preferenceOrder = ['GetCoins', 'GetHealth', 'Nothing', 'LoseHealth', 'LoseCoins'];
+    preferenceOrder = ['GetCoins', 'GetCoinsLoseHealth', 'GetHealth', 'Nothing', 'LoseHealth', 'GetHealthLoseCoins', 'LoseCoins']
   } else {
-    preferenceOrder = ['GetHealth', 'GetCoins', 'Nothing', 'LoseCoins', 'LoseHealth'];
+    preferenceOrder = ['GetHealth', 'GetHealthLoseCoins', 'GetCoins', 'Nothing', 'LoseCoins', 'GetCoinsLoseHealth', 'LoseHealth']
   }
 
-  var genericPreferenceMapping = []
-
-  preferenceOrder.forEach(myPref => {
-    preferenceOrder.forEach(otherPref => {
-      genericPreferenceMapping.push(myPref + otherPref);
-    })
-  });
-
-  //console.log(genericPreferenceMapping);
-
-  return genericPreferenceMapping;
-  /*return genericPreferenceMapping.filter(
-    consequence =>
-      Object.keys(availableProfiles).some(profileConsequence =>
-        profileConsequence === consequence
-      )
-  ).map(consequence => availableProfiles[consequence])*/
+  return preferenceOrder
+  // return preferenceOrder
 }
 
 /*
@@ -247,33 +198,15 @@ const isEnvyFree = (
 })
 
 const determineFairEquilibrium = (preferences0, preferences1) => {
-  const possibleActions = [
-    'upUp',
-    'downUp',
-    'leftUp',
-    'rightUp',
-    'upDown',
-    'downDown',
-    'leftDown',
-    'rightDown',
-    'upLeft',
-    'downLeft',
-    'leftLeft',
-    'rightLeft',
-    'upRight',
-    'downRight',
-    'leftRight',
-    'rightRight'
-  ]
-
   let bestActionSet
-  possibleActions.forEach(actionSet => {
+  preferences0.forEach(actionSet => {
     const index0 = preferences0.indexOf(actionSet)
     const index1 = preferences1.indexOf(actionSet)
     if (!bestActionSet && isEnvyFree(preferences0, preferences1, index0, index1)) {
       bestActionSet = { actionSet: [index0, index1] }
     }
     if (
+      (bestActionSet) &&
       (index0 >= Object.keys(bestActionSet)[0][0] && index0 >= Object.keys(bestActionSet)[0][0]) && // Pareto improvement
       (isEnvyFree(preferences0, preferences1, index0, index1)) // envy-free
     ) {
@@ -283,29 +216,38 @@ const determineFairEquilibrium = (preferences0, preferences1) => {
   return bestActionSet
 }
 
-const generateReward = (state, agentId, newPosition) => {
-  const availableProfiles = generateProfiles()
-  const preferences0 = generatePreferences(0, availableProfiles)
-  const preferences1 = generatePreferences(1, availableProfiles)
+const generateReward = (newPosition) => {
+  // const availableProfiles = generateProfiles()
+  const preferences0 = arena.agents[0].intentions.preferences
+  const preferences1 = arena.agents[1].intentions.preferences
+  // console.log(preferences0)
   const fairEquilibrium = determineFairEquilibrium(preferences0, preferences1)
-
-  console.log('generateReward')
-  console.log(arena.state.positions)
-  const fieldMovedToSelf = ''
-  const fieldMovedToOther = ''
-  return ''
+  console.log(`fair equilibrium: ${JSON.stringify(fairEquilibrium)}`)
+  console.log(`new position: ${newPosition}`)
+  const action0 = arena.agents[0].intentions.go
+  const action1 = arena.agents[1].intentions.go
+  const actualActionCombination = `${action0}${capitalize(action1)}`
+  const actualIndices = [
+    preferences0.indexOf(actualActionCombination),
+    preferences1.indexOf(actualActionCombination)
+  ]
+  const reward = -Math.abs(
+    (actualIndices[0] - fairEquilibrium.actionSet[0]) *
+    (actualIndices[1] - fairEquilibrium.actionSet[1])
+  )
+  console.log(`reward: ${reward}`)
+  return reward
 }
 
 const generateConsequence = (state, agentId, newPosition) => {
-  state.rewards[agentId] = 0;
-  state.health[agentId] = state.health[agentId] - 1;
+  state.health[agentId] = state.health[agentId] - 1
 
   switch (state.fields[newPosition]) {
     case 'plain':
       if (state.positions.includes(newPosition)) {
         state.health = state.health.map((healthScore, index) => {
           if (state.positions[index] === newPosition) {
-            if (state.health[index] <= 10) {
+            if (state.health[index] <= 0) {
               state.positions[index] = undefined
             }
             healthScore = healthScore - 10
@@ -318,7 +260,6 @@ const generateConsequence = (state, agentId, newPosition) => {
         if (state.health[agentId] <= 0) {
           state.positions[agentId] = undefined
         }
-        state.rewards[agentId] = -1
       } else {
         state.positions[agentId] = newPosition
       }
@@ -331,12 +272,10 @@ const generateConsequence = (state, agentId, newPosition) => {
       } else {
         state.coins[1] = state.coins[1] - coinDamage
       }
-      state.rewards[agentId] = 1
       break
     case 'repair':
-      if (state.health[agentId] < 100) { 
+      if (state.health[agentId] < 100) {
         state.health[agentId] = Math.min(state.health[agentId] + 10, 100)
-        state.rewards[agentId] = 1
       }
       const healthDamage = genRandInt(1, 5)
       if (agentId === '1') {
@@ -350,45 +289,48 @@ const generateConsequence = (state, agentId, newPosition) => {
           state.positions[1] = undefined
         }
       }
-      
       break
   }
+  if (agentId === '0') {
+    state.latestMove0 = state.fields[newPosition]
+  }
   if (agentId === '1') {
-    //state.rewards[0] = generateReward(state, 0, state.fields[newPosition]);
-    //state.rewards[1] = generateReward(state, 1, state.fields[newPosition]);
+    state.rewards[0] = generateReward(state.fields[newPosition])
+    state.rewards[1] = generateReward(state.fields[newPosition])
+    state.rewardsAcc[0] = state.rewardsAcc[0] + state.rewards[0]
+    state.rewardsAcc[1] = state.rewardsAcc[1] + state.rewards[1]
 
     state.iterations = state.iterations + 1
 
-    if (state.iterations % 100 == 0) {
-      console.log(state.iterations, "steps completed");
+    if (state.iterations % 100 === 0) {
+      console.log(state.iterations, 'steps completed')
     }
 
-    if (state.iterations % 500 == 0) {
-      console.log("reset positions");
+    if (state.iterations % 500 === 0) {
+      console.log('reset positions')
 
       for (var i = 0; i < 2; i++) {
         var plainFields = Object.keys(state.fields).filter(
           key => state.fields[key] === 'plain'
         )
-        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-        state.positions[i] = newPosition;
+        const newPosition = parseInt(plainFields[Math.floor(Math.random() * plainFields.length)])
+        state.positions[i] = newPosition
       }
     }
   }
 
   for (var deadAgentId = 0; deadAgentId < 2; deadAgentId++) {
-    if (state.positions[deadAgentId] == null) {
-        var plainFields = Object.keys(state.fields).filter(
-          key => state.fields[key] === 'plain'
-        )
-        var newPosition = plainFields[Math.floor(Math.random()*plainFields.length)];
-        state.positions[deadAgentId] = newPosition;
-        state.health[deadAgentId] = 100;
-        state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0);
+    console.log(state.positions)
+    if (state.positions[deadAgentId] === undefined) {
+      const plainFields = Object.keys(state.fields).filter(
+        key => state.fields[key] === 'plain'
+      )
+      const newPosition = parseInt(plainFields[Math.floor(Math.random() * plainFields.length)])
+      state.positions[deadAgentId] = newPosition
+      state.health[deadAgentId] = 100
+      state.coins[deadAgentId] = Math.min(state.coins[deadAgentId] - 20, 0)
     }
   }
-
-  state.rewards_acc[agentId] = state.rewards_acc[agentId] + state.rewards[agentId]
 
   return state
 }
@@ -423,8 +365,8 @@ const stateFilter = (state, agentId, agentBeliefs) => ({
   ...agentBeliefs,
   coins: state.coins[agentId],
   health: state.health[agentId],
-  partnerCoins: state.coins[1-agentId],
-  partnerHealth: state.health[1-agentId],
+  partnerCoins: state.coins[1 - agentId],
+  partnerHealth: state.health[1 - agentId],
   neighborStates: determineNeighborStates(state.positions[agentId], state.fields),
   fullGridWorld: state.fields, // fully observable,
   positions: state.positions,

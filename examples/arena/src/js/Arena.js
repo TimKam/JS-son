@@ -4,7 +4,7 @@ import { Belief, Desire, Plan, Agent, GridWorld, FieldType } from 'js-son-agent'
 var RL = require('./rl.js')
 
 const actionMapping = ['up', 'down', 'left', 'right']
-const fieldMapping = { 'mountain': 0, 'plain': 1, 'diamond': 2, 'repair': 3 }
+const fieldMapping = { 'mountain': 0, 'plain': 0.2, 'diamond': 0.4, 'repair': 0.6 }
 const fieldOwnEffects = { 'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'GetCoins', 'repair': 'GetHealth' }
 const fieldPartnerEffects = { 'mountain': 'Nothing', 'plain': 'Nothing', 'diamond': 'LoseCoins', 'repair': 'LoseHealth' }
 const RLEnv = {
@@ -21,14 +21,19 @@ const desiresRL = {
     }
 
     var stateVector = beliefs.fullGridWorld.map(field => fieldMapping[field])
-    stateVector[beliefs.positions[0]] = 4
-    stateVector[beliefs.positions[1]] = 5
-    stateVector.push(beliefs.health)
+    stateVector[beliefs.positions[0]] = 0.8
+    stateVector[beliefs.positions[1]] = 1.0
+    stateVector.push(beliefs.health/100)
     stateVector.push(beliefs.coins)
-    stateVector.push(beliefs.partnerHealth)
+    stateVector.push(beliefs.partnerHealth/100)
     stateVector.push(beliefs.partnerCoins)
 
     const a = beliefs.policy.act(stateVector)
+
+    const newEpsilon = Math.max(0.01, beliefs.policy.epsilon*0.99);
+    //console.log("newEpsilon", newEpsilon);
+    beliefs.policy.epsilon = newEpsilon; 
+
     return actionMapping[a]
   }),
   ...Desire('preferences', beliefs => {
@@ -104,7 +109,7 @@ function generateAgent (position, index, state) {
   if (state.policies[index] == null) {
     // Deep Q-Learning with a neural net function approximation;
     // for gridworld a convnet could be more efficient, but not supported in reinforcejs; should switch to tensorflow-js later
-    var spec = { alpha: 0.01, epsilon: 0.2, num_hidden_units: 64 } // TODO Exploration scheduling
+    var spec = { alpha: 0.03, epsilon: 0.4, num_hidden_units: 100 }
     state.policies[index] = new RL.DQNAgent(RLEnv, spec)
   }
 
@@ -220,10 +225,8 @@ const generateReward = (newPosition) => {
   // const availableProfiles = generateProfiles()
   const preferences0 = arena.agents[0].intentions.preferences
   const preferences1 = arena.agents[1].intentions.preferences
-  // console.log(preferences0)
   const fairEquilibrium = determineFairEquilibrium(preferences0, preferences1)
   console.log(`fair equilibrium: ${JSON.stringify(fairEquilibrium)}`)
-  console.log(`new position: ${newPosition}`)
   const action0 = arena.agents[0].intentions.go
   const action1 = arena.agents[1].intentions.go
   const actualActionCombination = `${action0}${capitalize(action1)}`
@@ -320,8 +323,7 @@ const generateConsequence = (state, agentId, newPosition) => {
   }
 
   for (var deadAgentId = 0; deadAgentId < 2; deadAgentId++) {
-    console.log(state.positions)
-    if (state.positions[deadAgentId] === undefined) {
+    if (state.health[deadAgentId] <= 0) {
       const plainFields = Object.keys(state.fields).filter(
         key => state.fields[key] === 'plain'
       )

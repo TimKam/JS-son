@@ -483,6 +483,9 @@ To run the example, install its dependencies with ``npm install`` and run the ap
 By default, *JS-son* supports grid world environments.
 A comprehensive multi-agent grid world tutorial is provided [here in the examples section](./examples/arena/README.md).
 
+### Serverless
+[This tutorial](./examples/serverless/README.md) describes how to run JS-son agents as *serverless* Google Cloud Functions.
+
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.

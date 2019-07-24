@@ -1,6 +1,7 @@
 # JS-son - a Lean, Extensible JavaScript Agent Programming Library
 
 [![ ](https://circleci.com/gh/TimKam/JS-son.svg?style=svg)](https://circleci.com/gh/TimKam/JS-son)
+[![ ](https://readthedocs.org/projects/js-son/badge/?version=latest)](https://js-son.readthedocs.io/en/latest/?badge=latest)
 
 ``JS-son`` is a lean and extensible JavaScript library for programming agents.
 It has a focus on reasoning loops (agent-internals), and supports the belief-desire-intention approach, among others.

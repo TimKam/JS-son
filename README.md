@@ -1,6 +1,6 @@
 # JS-son - a Minimal JavaScript BDI Agent Library
 
-[![Build Status](https://travis-ci.org/TimKam/JS-son.svg?branch=master)](https://travis-ci.org/TimKam/JS-son)
+[![CircleCI](https://circleci.com/gh/TimKam/JS-son.svg?style=svg)](https://circleci.com/gh/TimKam/JS-son)
 
 ``JS-son`` is a minimal JavaScript library for implementing intelligent agents that follow the belief, desire, intention approach.
 Install it with:
@@ -328,11 +328,7 @@ const desiresIntrospective = {
 ```
 
 The agents desires are mutually exclusive.
-Hence, the agents' intentions merely relay their desires, which is reflected in the following preference function generator:
-
-```JavaScript
-const preferenceFunctionGen = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
-```
+Hence, the agents' intentions merely relay their desires, which is reflected by the default preference function generator.
 
 The agents' plans are to disseminate the announcement (``true`` or ``false``) as determined by the desire functions:
 
@@ -370,8 +366,7 @@ const createAgents = () => {
       `${type}${index}`,
       { ...beliefs, ...Belief('type', type) },
       desires,
-      plans,
-      preferenceFunctionGen
+      plans
     )
   })
   const numberBeliefsTrue = Object.keys(state).filter(
@@ -484,6 +479,13 @@ We integrated the Game of Life simulation in a [Framework7](https://framework7.i
 You find the the source code of the web application [here in the examples directory](https://github.com/TimKam/JS-son/tree/master/examples/web).
 To run the example, install its dependencies with ``npm install`` and run the application in development (hot-reload) mode with ``npm run dev``.
 
+### Grid World
+By default, *JS-son* supports grid world environments.
+A comprehensive multi-agent grid world tutorial is provided [here in the examples section](./examples/arena/README.md).
+
+### Serverless
+[This tutorial](./examples/serverless/README.md) describes how to run JS-son agents as *serverless* Google Cloud Functions.
+
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.
@@ -514,5 +516,16 @@ Contributors should consider the following conventions:
 
 ## Acknowledgements
 **Author**: Timotheus Kampik - [@TimKam](https://github.com/TimKam)
+
+**Cite as**:
+
+```
+@inproceedings{js-son,
+  title={{JS-son - A Minimalistic JavaScript BDI Agent Library}},
+  author={Kampik, Timotheus and Nieves, Juan Carlos},
+  booktitle={7th International Workshop on Engineering Multi-Agent Systems (EMAS 2019), Montreal, Canada, 13--14 May, 2019},
+  year={2019}
+}
+```
 
 This work was partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.

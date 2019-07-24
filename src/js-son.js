@@ -1,17 +1,12 @@
-const Belief = require('./agent/Belief')
-const Desire = require('./agent/Desire')
-const Intentions = require('./agent/Intentions')
-const Plan = require('./agent/Plan')
-const Agent = require('./agent/Agent')
-const Environment = require('./environment/Environment')
-
 const JSson = {
-  Belief,
-  Desire,
-  Intentions,
-  Plan,
-  Agent,
-  Environment
+  Belief: require('./agent/Belief'),
+  Desire: require('./agent/Desire'),
+  Intentions: require('./agent/Intentions'),
+  Plan: require('./agent/Plan'),
+  Agent: require('./agent/Agent'),
+  Environment: require('./environment/Environment'),
+  GridWorld: require('./environment/GridWorld'),
+  FieldType: require('./environment/FieldType')
 }
 
 module.exports = JSson

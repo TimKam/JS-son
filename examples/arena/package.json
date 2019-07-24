@@ -1,15 +1,15 @@
 {
-  "name": "js-son-game-of-life",
+  "name": "js-son-arena",
   "private": true,
   "version": "1.0.0",
-  "description": "JS-son: Game of Life",
+  "description": "JS-son Arena",
   "repository": "",
   "license": "UNLICENSED",
   "framework7": {
     "type": [
       "web"
     ],
-    "name": "JS-son: Game of Life",
+    "name": "JS-son Arena",
     "framework": "core",
     "template": "single-view",
     "bundler": "webpack",
@@ -36,8 +36,9 @@
     "dom7": "^2.1.3",
     "framework7": "^4.0.1",
     "framework7-icons": "^2.2.0",
-    "template7": "^1.4.1",
-    "js-son-agent": "^0.0.5"
+    "js-son-agent": "^0.0.5",
+    "material-design-icons": "^3.0.1",
+    "template7": "^1.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

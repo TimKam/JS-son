@@ -6,11 +6,19 @@ const Intentions = require('./Intentions')
  * @param {object} beliefs initial beliefs of the agents
  * @param {object} desires the agent's desires
  * @param {array} plans the agent's plans
- * @param {function} determinePreferences preference function
+ * @param {function} determinePreferences preference function generator; by default
+                                          (if no function is provided), the preference function
+                                          turns all desires into intentions
  * @returns {object} JS-son agent object
  */
 
-function Agent (id, beliefs, desires, plans, determinePreferences) {
+function Agent (
+  id,
+  beliefs,
+  desires,
+  plans,
+  determinePreferences = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+) {
   this.id = id
   this.beliefs = beliefs
   this.desires = desires
@@ -23,7 +31,7 @@ function Agent (id, beliefs, desires, plans, determinePreferences) {
       ...beliefs
     }
     if (this.isActive) {
-      if (Object.keys(desires).length === 0 && determinePreferences === undefined) {
+      if (Object.keys(desires).length === 0) {
         this.intentions = this.beliefs
       } else {
         this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)

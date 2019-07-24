@@ -18,7 +18,7 @@ describe('Agent / next()', () => {
 
   it('should return plan execution result for active plans', () => {
     agent.start()
-    expect(agent.next(beliefs)[0]).toEqual({
+    expect(agent.next({ ...beliefs, dogHungry: false })).toContain({
       actions: ['Good dog!']
     })
   })
@@ -31,5 +31,11 @@ describe('Agent / next()', () => {
   it('should allow belief updates', () => {
     agent.start()
     expect(agent.next({ ...Belief('dogNice', false) }).length).toEqual(0)
+  })
+
+  it('should apply the default preference function generation if no other is specified', () => {
+    const defaultPreferenceAgent = new Agent('myAgent', beliefs, desires, plans)
+    defaultPreferenceAgent.start()
+    expect(defaultPreferenceAgent.next({ ...beliefs, dogHungry: true }).length).toEqual(2)
   })
 })

@@ -2,12 +2,7 @@
 We import js-son and assign Belief, Plan, Agent, and Environment to sepearate consts for the sake of
 convenience:
 */
-const JSson = require('js-son-agent')
-
-const Belief = JSson.Belief
-const Plan = JSson.Plan
-const Agent = JSson.Agent
-const Environment = JSson.Environment
+const { Belief, Plan, Agent, Environment } = require('js-son-agent')
 
 /*
 Basic example of using the basic belief-plan approach with JSson

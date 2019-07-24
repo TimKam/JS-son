@@ -33,7 +33,6 @@ We import the JS-son dependencies:
 const {
   Belief,
   Desire,
-  Intentions, // eslint-disable-line no-unused-vars
   Plan,
   Agent,
   Environment
@@ -101,11 +100,9 @@ const desiresIntrospective = {
 
 /*
 The agents desires are mutually exclusive. Hence, the agents' intentions merely relay their desires,
-which is reflected in the following preference function generator:
-*/
-const preferenceFunctionGen = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+which is reflected by the default preference function generator
+``(beliefs, desires) => desireKey => desires[desireKey](beliefs)``
 
-/*
 The agents' plans are to disseminate the announcement (``true`` or ``false``) as determined by the
 desire functions:
 */
@@ -142,8 +139,7 @@ const createAgents = () => {
       `${type}${index}`,
       { ...beliefs, ...Belief('type', type) },
       desires,
-      plans,
-      preferenceFunctionGen
+      plans
     )
   })
   const numberBeliefsTrue = Object.keys(state).filter(
@@ -196,8 +192,10 @@ const stateFilter = (state, agentKey, agentBeliefs) => {
     () => 0.5 - Math.random()
   ).slice(0, 2)
   // add some noise
-  let noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 50 * Math.random() ? [true] : []
-  noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 29 * Math.random() ? [false] : noise
+  let noise = Object.keys(state).filter(
+    agentId => state[agentId].keyBelief).length < 50 * Math.random() ? [true] : []
+  noise = Object.keys(state).filter(agentId => state[agentId].keyBelief).length < 29 * Math.random()
+    ? [false] : noise
   // combine announcements
   const pastReceivedAnnouncements =
     recentVolatileAnnouncements.concat(

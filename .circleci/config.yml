@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/project/JS-son
+    docker:
+      - image: circleci/node:11.9.0
+    steps:
+      - checkout
+      - run: sudo npm install -g npm@latest
+      - run: npm install
+      - run: npm test

@@ -76,6 +76,7 @@ out/
 examples/node/package-lock.json
 examples/node/node_modules/
 examples/web/www
+examples/arena/www
 
 # Babel buiild
 lib

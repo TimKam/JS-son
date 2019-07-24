@@ -1,8 +1,9 @@
-# JS-son - a Minimal JavaScript BDI Agent Library
+# JS-son - a Lean, Extensible JavaScript Agent Programming Library
 
-[![CircleCI](https://circleci.com/gh/TimKam/JS-son.svg?style=svg)](https://circleci.com/gh/TimKam/JS-son)
+[![ ](https://circleci.com/gh/TimKam/JS-son.svg?style=svg)](https://circleci.com/gh/TimKam/JS-son)
 
-``JS-son`` is a minimal JavaScript library for implementing intelligent agents that follow the belief, desire, intention approach.
+``JS-son`` is a lean and extensible JavaScript library for programming agents.
+It has a focus on reasoning loops (agent-internals), and supports the belief-desire-intention approach, among others.
 Install it with:
 
 ```
@@ -11,6 +12,8 @@ npm install js-son-agent
 
 ## Belief-Desire-Intention (BDI) Agents
 *JS-son* follows the belief-desire-intention(-plan) (BDI) approach; a popular model for developing intelligent agents.
+However, it is also possible to implement agents that follow simpler reasoning-loop approaches.
+For example, in its simplest form, *JS-son* agents can follow a *belief-plan* approach, that means based on their perception of their environment and their own internal state, the execution of plans--which act on the environment and update the agent's own beliefs--is determined.
 
 In this section, we explain how *JS-son* agents make use of the BDI (and plan) concepts and how the *Environment* object type processes agent actions.
 For detailed documentation of the corresponding *JS-son* object types and functions, generate the JSDoc (see below).
@@ -52,9 +55,10 @@ yarn add js-son-agent
 Only when you want to work on the *JS-son* code base, you should install some *dev dependencies* for linting an testing.
 
 ## Tutorials
-To illustrate how *JS-son* works, we present two tutorials.
+To illustrate how *JS-son* works, we first present two basic tutorials.
 In the first one, we use the simplified belief-plan approach; the second tutorial presents the full belief-desire-intention-plan approach.
-You find the source code of the tutorials at [https://github.com/TimKam/JS-son/tree/master/examples/node](https://github.com/TimKam/JS-son/tree/master/examples/node).
+You find the source code of these tutorials at [https://github.com/TimKam/JS-son/tree/master/examples/node](https://github.com/TimKam/JS-son/tree/master/examples/node).
+In addition, we provide a set of advanced tutorials that show how *JS-son* can be applied in different contexts: in web apps, Jupyter notebooks, grid worlds, and *serverless* (Function-as-a-Service) environments.
 
 ### Belief-Plan Approach
 In this tutorial, we use basic belief-plan approach to implement the [Jason _room_ example](https://github.com/jason-lang/jason/tree/master/examples/room) with *JS-son*.
@@ -481,15 +485,20 @@ To run the example, install its dependencies with ``npm install`` and run the ap
 
 ### Grid World
 By default, *JS-son* supports grid world environments.
-A comprehensive multi-agent grid world tutorial is provided [here in the examples section](./examples/arena/README.md).
+A comprehensive multi-agent grid world tutorial is provided [here in the examples section](https://github.com/TimKam/JS-son/tree/master/examples/arena/README.md).
 
 ### Serverless
-[This tutorial](./examples/serverless/README.md) describes how to run JS-son agents as *serverless* Google Cloud Functions.
+[This tutorial](https://github.com/TimKam/JS-son/tree/master/examples/serverless/README.md) describes how to run JS-son agents as *serverless* Google Cloud Functions.
 
 ## Supported Platforms
 *JS-son* supports recent versions of Firefox, Chrome, and Node.js.
 It is not tested for other platforms and does not use [Babel](https://babeljs.io/) to facilitate compatibility with legacy platforms.
 Contributions that change this are welcome!
+
+## Further Content
+* [Grid world tutorial](./gridworld.md)
+* [Serverless tutorial](./serverless.md)
+* [API reference](./api.md)
 
 ## Testing
 The project uses [Jasime](https://jasmine.github.io/2.0/node.html) for testing.
@@ -497,8 +506,11 @@ Run the tests with ``npm test``.
 The tests also run on Travis-CI.
 
 ## Documentation
-*JS-son* is documented with [JSDoc](http://usejsdoc.org/). Generate the documentation by running: ``npm run doc``.
-The documentation will be placed (as HTML files) to the ``out`` directory.
+*JS-son* is documented with [Sphinx](http://www.sphinx-doc.org/en/master/).
+Building the documentation requires Python and CMake.
+Install the Python dependencies for the documentation with ``pip install -r doc-requirements.txt``.
+Generate the documentation by navigating to the ``doc`` directory and running ``make html``.
+The documentation will be placed (as HTML files) to ``doc/_build/html``.
 
 ## Contributions
 We welcome contributions.
@@ -516,6 +528,8 @@ Contributors should consider the following conventions:
 
 ## Acknowledgements
 **Author**: Timotheus Kampik - [@TimKam](https://github.com/TimKam)
+
+**Agent Architecture Co-Designer**: Juan Carlos Nieves
 
 **Cite as**:
 

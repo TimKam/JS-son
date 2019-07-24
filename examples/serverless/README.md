@@ -100,8 +100,8 @@ To implement a JS-son multi-agent system (or single JS-son agent) as a serverles
   ```
 
 4. Implement the multi-agent system. 
-   In our example, we implement the belief spread simulation as described in the [data science tutorial](./jupyter/JS-son_Data_Science_Demo.ipynb).
-   We wrap the belief spread simulation into a stateless function that can be called with the parameters ``bias`` (a higher bias leads to a stronger facilitation of ``true`` beliefs) and ``ticks`` (specifying the length of the simulation run). The code for the whole function is available [here](./index.js).
+   In our example, we implement the belief spread simulation as described in the [data science tutorial](https://github.com/TimKam/JS-son/blob/master/examples/jupyter/JS-son_Data_Science_Demo.ipynb).
+   We wrap the belief spread simulation into a stateless function that can be called with the parameters ``bias`` (a higher bias leads to a stronger facilitation of ``true`` beliefs) and ``ticks`` (specifying the length of the simulation run). The code for the whole function is available [here](https://github.com/TimKam/JS-son/blob/master/examples/serverless/index.js).
 
   ```JavaScript
     /**

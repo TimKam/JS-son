@@ -109,7 +109,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
 })
 ```
 
-We also need to configure some UI styles that will make the grid work environment look good; you find them in [app.css stylesheet](./src/css/app.css).
+We also need to configure some UI styles that will make the grid work environment look good; you find them in [app.css stylesheet](https://github.com/TimKam/JS-son/blob/master/examples/arena/src/css/app.css).
 
 ## Agents and Environment
 Now, we can start with the core of the tutorial: implementing *JS-son* agents and environment.
@@ -403,7 +403,7 @@ export default Arena
 To run the application, execute ``npm run dev`` in the root directory of this example project.
 Your browser will automatically open the application, which looks like this:
 
-![JS-son: Arena example](js-son-arena.png)
+![JS-son: Arena example](https://raw.githubusercontent.com/TimKam/JS-son/master/examples/arena/js-son-arena.png)
 
 To run the full build to generate files that can be deployed to a website run ``npm run build-prod``.
 

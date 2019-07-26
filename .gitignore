@@ -72,6 +72,9 @@ typings/
 # JS doc
 out/
 
+# Sphinx doc
+doc/_build/
+
 # Examples
 examples/node/package-lock.json
 examples/node/node_modules/
@@ -80,3 +83,6 @@ examples/arena/www
 
 # Babel buiild
 lib
+
+# Python virtual environment
+venv/

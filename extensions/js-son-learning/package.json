@@ -1,0 +1,24 @@
+{
+  "name": "js-son-learning",
+  "version": "0.0.1",
+  "description": "Learning for cognitive agents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TimKam/JS-son/extensions/js-son-learning"
+  },
+  "keywords": [
+    "machine",
+    "learning",
+    "multi-agent",
+    "systems"
+  ],
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@tensorflow/tfjs": "^1.2.2"
+  }
+}

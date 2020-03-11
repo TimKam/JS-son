@@ -43,7 +43,8 @@ release = '0.0.5'
 # ones.
 extensions = [
   'sphinx_js',
-  'recommonmark'
+  'recommonmark',
+  'sphinxcontrib.versioning.sphinx_'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

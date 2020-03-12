@@ -1,0 +1,16 @@
+{
+  "name": "js-son-distributed-example",
+  "version": "0.0.1",
+  "description": "JS-son example with distributed agents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "^4.17.1",
+    "js-son-agent": "file:../..",
+    "ws": "^7.2.3"
+  }
+}

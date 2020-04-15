@@ -1,0 +1,16 @@
+{
+  "name": "js-son-distributed-example",
+  "version": "0.0.1",
+  "description": "Distributed MAS example of the JS-son library",
+  "main": "index.js",
+  "dependencies": {
+    "js-son-agent": "../../",
+    "ws": "^7.2.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause"
+}

@@ -488,6 +488,10 @@ To run the example, install its dependencies with ``npm install`` and run the ap
 By default, *JS-son* supports grid world environments.
 A comprehensive multi-agent grid world tutorial is provided [here in the examples section](https://github.com/TimKam/JS-son/tree/master/examples/arena/README.md).
 
+### Distributed MAS
+*JS-son* supports distributed multi-agent systems, where the environment interacts with remotely running agents.
+A tutorial on how to implement distributed MAS with *JS-son*, alongside a running example, is available [here](https://github.com/TimKam/JS-son/tree/master/examples/distributed/README.md).
+
 ### Serverless
 [This tutorial](https://github.com/TimKam/JS-son/tree/master/examples/serverless/README.md) describes how to run JS-son agents as *serverless* Google Cloud Functions.
 

@@ -18,6 +18,8 @@ const {
   dogPlans
 } = require('../mocks/dog')
 
+const { updateMAS } = require('../mocks/environment')
+
 describe('Integration: belief-plan approach', () => {
   const human = new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
   const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
@@ -29,19 +31,6 @@ describe('Integration: belief-plan approach', () => {
     dogRecentlyPraised: false
   }
 
-  const updateMAS = actions => {
-    const stateUpdate = {}
-    actions.forEach(action => {
-      if (action.actions.includes('Here, take some food!')) stateUpdate.foodAvailable = true
-      if (action.actions.includes('Good dog!')) stateUpdate.dogRecentlyPraised = true
-      else stateUpdate.dogRecentlyPraised = false
-      if (action.actions.includes('Eat')) {
-        stateUpdate.foodAvailable = false
-        stateUpdate.dogHungry = false
-      }
-    })
-    return stateUpdate
-  }
   const environment = new Environment([human, dog], state, updateMAS)
 
   it('Should allow agent-to-agent interaction', () => {

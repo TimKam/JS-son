@@ -5,6 +5,7 @@
  * @param {function} update Update function, in particular for processing agent actions
  * @param {function} render Visualization function of the environment's current state
  * @param {function} stateFilter Function for filtering state that agents should receive
+ * @param {function} runner Function that manages the next "tick"
  * @returns {object} JS-son environment object
 */
 function Environment (
@@ -12,7 +13,14 @@ function Environment (
   state,
   update,
   render = state => console.log(state),
-  stateFilter = state => state
+  stateFilter = state => state,
+  runner = run => iterations => {
+    if (iterations) {
+      Array(iterations).fill(0).forEach(run)
+    } else {
+      while (true) run()
+    }
+  }
 ) {
   this.agents = {}
   agents.forEach(agent => (this.agents[agent.id] = agent))
@@ -21,6 +29,7 @@ function Environment (
   this.render = render
   this.stateFilter = stateFilter
   this.history = []
+  this.runner = runner
   this.reset = () => (this.history = [])
   this.run = iterations => {
     this.history.push(this.state)
@@ -38,11 +47,7 @@ function Environment (
       this.history.push(this.state)
       this.render(this.state)
     }
-    if (iterations) {
-      Array(iterations).fill(0).forEach(run)
-    } else {
-      while (true) run()
-    }
+    this.runner(run)(iterations)
     return this.history
   }
 }

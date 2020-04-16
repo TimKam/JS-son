@@ -3,7 +3,7 @@ const Intentions = require('./Intentions')
 /**
  * JS-son agent generation function
  * @param {string} id unique identifier for the agent
- * @param {object} beliefs initial beliefs of the agents
+ * @param {object} beliefs initial beliefs of the agent
  * @param {object} desires the agent's desires
  * @param {array} plans the agent's plans
  * @param {function} determinePreferences preference function generator; by default

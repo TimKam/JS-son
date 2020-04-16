@@ -6,6 +6,8 @@
 
 .. js:autofunction:: Agent
 
+.. js:autofunction:: RemoteAgent
+
 .. js:autofunction:: Belief
 
 .. js:autofunction:: Desire

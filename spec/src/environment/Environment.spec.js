@@ -87,4 +87,23 @@ describe('Environment / run()', () => {
     ]
     expect(history).toEqual(expectedHistory)
   })
+
+  it('Should allow for the specification of a custom runner function', () => {
+    const runner = run => iterations => Array(iterations).fill(0).forEach(run)
+    const environment = new Environment(
+      [human],
+      state,
+      update,
+      state => console.log(state),
+      state => state,
+      runner
+    )
+    const history = environment.run(2)
+    const expectedHistory = [
+      { dogNice: true, dogHungry: true },
+      { dogNice: true, dogHungry: false },
+      { dogNice: true, dogHungry: false }
+    ]
+    expect(history).toEqual(expectedHistory)
+  })
 })

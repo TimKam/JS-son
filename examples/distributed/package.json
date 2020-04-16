@@ -4,7 +4,7 @@
   "description": "Distributed MAS example of the JS-son library",
   "main": "index.js",
   "dependencies": {
-    "js-son-agent": "../../",
+    "js-son-agent": "^0.0.6",
     "ws": "^7.2.3"
   },
   "devDependencies": {},

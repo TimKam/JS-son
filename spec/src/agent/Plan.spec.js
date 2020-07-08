@@ -26,4 +26,15 @@ describe('Plan / run()', () => {
     }
     expect(praiseDog.run(intentions)).toEqual(expectedPlanResult)
   })
+
+  it('should allow for the access of beliefs/intentions in plans', () => {
+    const praiseDog = Plan(_ => _.dogNice, _ => ({
+      actions: [`Good dog, ${_.dogName}!`]
+    }))
+    const expectedPlanResult = {
+      actions: ['Good dog, Hasso!']
+    }
+    beliefs.dogName = 'Hasso'
+    expect(praiseDog.run(beliefs)).toEqual(expectedPlanResult)
+  })
 })

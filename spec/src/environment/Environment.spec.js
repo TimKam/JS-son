@@ -89,14 +89,12 @@ describe('Environment / run()', () => {
   })
 
   it('Should allow for the specification of a custom runner function', () => {
-    const runner = run => iterations => Array(iterations).fill(0).forEach(run)
     const environment = new Environment(
       [human],
       state,
       update,
       state => console.log(state),
-      state => state,
-      runner
+      state => state
     )
     const history = environment.run(2)
     const expectedHistory = [
@@ -105,5 +103,52 @@ describe('Environment / run()', () => {
       { dogNice: true, dogHungry: false }
     ]
     expect(history).toEqual(expectedHistory)
+  })
+
+  it('Should allow for agent-specific state-filtering', () => {
+    const stateFilter1 = (state, agentId) => {
+      if (agentId === 'human') {
+        return {
+          ...state,
+          dogNice: false
+        }
+      }
+      return state
+    }
+    const stateFilter2 = (state, agentId) => {
+      if (agentId === 'dog') {
+        return {
+          ...state,
+          dogNice: false
+        }
+      }
+      return state
+    }
+    const history1 = new Environment(
+      [human],
+      state,
+      update,
+      state => console.log(state),
+      stateFilter1
+    ).run(2)
+    const expectedHistory1 = [
+      { dogNice: true, dogHungry: true },
+      { dogNice: true, dogHungry: true },
+      { dogNice: true, dogHungry: true }
+    ]
+    expect(history1).toEqual(expectedHistory1)
+    const history2 = new Environment(
+      [human],
+      state,
+      update,
+      state => console.log(state),
+      stateFilter2
+    ).run(2)
+    const expectedHistory2 = [
+      { dogNice: true, dogHungry: true },
+      { dogNice: true, dogHungry: false },
+      { dogNice: true, dogHungry: false }
+    ]
+    expect(history2).toEqual(expectedHistory2)
   })
 })

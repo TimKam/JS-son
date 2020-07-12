@@ -1,4 +1,5 @@
 const Belief = require('../../../src/agent/Belief')
+const Plan = require('../../../src/agent/Plan')
 const Agent = require('../../../src/agent/Agent')
 
 const {
@@ -37,5 +38,38 @@ describe('Agent / next()', () => {
     const defaultPreferenceAgent = new Agent('myAgent', beliefs, desires, plans)
     defaultPreferenceAgent.start()
     expect(defaultPreferenceAgent.next({ ...beliefs, dogHungry: true }).length).toEqual(2)
+  })
+
+  it('should allow belief updates as part of the agent\'s internal reasoning loop', () => {
+    const newPlans = []
+    newPlans.concat(plans)
+    newPlans.push(Plan(
+      () => true,
+      function () {
+        this.beliefs.test = true
+        return {
+          actions: ['Good dog!']
+        }
+      }
+    ))
+    const newAgent = new Agent('myAgent', beliefs, desires, newPlans, preferenceFunctionGen)
+    newAgent.next()
+    expect(newAgent.beliefs.test).toBe(true)
+  })
+
+  it('should not allow dynamic belief updates if this feature is deactivate', () => {
+    const newPlans = []
+    newPlans.concat(plans)
+    newPlans.push(Plan(
+      () => true,
+      function () {
+        this.beliefs.test = true
+        return {
+          actions: ['Good dog!']
+        }
+      }
+    ))
+    const newAgent = new Agent('myAgent', beliefs, desires, newPlans, preferenceFunctionGen, false)
+    expect(() => newAgent.next()).toThrow(new TypeError("Cannot set property 'test' of undefined"))
   })
 })

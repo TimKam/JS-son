@@ -9,6 +9,8 @@ const Intentions = require('./Intentions')
  * @param {function} determinePreferences preference function generator; by default
                                           (if no function is provided), the preference function
                                           turns all desires into intentions
+ * @param {boolean} selfUpdatesPossible If true, agents can update their own belief, plans et cetera
+                                        via the body of their plans. Defaults to ``true``.
  * @returns {object} JS-son agent object
  */
 
@@ -17,13 +19,15 @@ function Agent (
   beliefs,
   desires,
   plans,
-  determinePreferences = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
+  determinePreferences = (beliefs, desires) => desireKey => desires[desireKey](beliefs),
+  selfUpdatesPossible = true
 ) {
   this.id = id
   this.beliefs = beliefs
   this.desires = desires
   this.plans = plans
   this.preferenceFunction = determinePreferences
+  this.selfUpdatesPossible = selfUpdatesPossible
   this.isActive = true
   this.next = function (beliefs) {
     this.beliefs = {
@@ -37,7 +41,9 @@ function Agent (
         this.intentions = Intentions(this.beliefs, this.desires, this.preferenceFunction)
       }
       return this.plans.map(
-        plan => plan.run(this.intentions)
+        plan => selfUpdatesPossible
+          ? plan.run.apply(this, [this.intentions])
+          : plan.run(this.intentions)
       ).filter(
         result => result !== null
       )

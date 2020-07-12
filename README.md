@@ -539,11 +539,19 @@ Contributors should consider the following conventions:
 **Cite as**:
 
 ```
-@inproceedings{js-son,
-  title={{JS-son - A Minimalistic JavaScript BDI Agent Library}},
-  author={Kampik, Timotheus and Nieves, Juan Carlos},
-  booktitle={7th International Workshop on Engineering Multi-Agent Systems (EMAS 2019), Montreal, Canada, 13--14 May, 2019},
-  year={2019}
+@InProceedings{10.1007/978-3-030-51417-4_11,
+author="Kampik, Timotheus
+and Nieves, Juan Carlos",
+editor="Dennis, Louise A.
+and Bordini, Rafael H.
+and Lesp{\'e}rance, Yves",
+title="JS-son - A Lean, Extensible JavaScript Agent Programming Library",
+booktitle="Engineering Multi-Agent Systems",
+year="2020",
+publisher="Springer International Publishing",
+address="Cham",
+pages="215--234",
+isbn="978-3-030-51417-4"
 }
 ```
 

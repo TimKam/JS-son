@@ -9,7 +9,9 @@ const Plan = (head, body) => ({
   head,
   body,
   // run: executed body if head is true; else: return null
-  run: beliefs => head(beliefs) === true ? body(beliefs) : null
+  run: function (beliefs) {
+    return head(beliefs) === true ? body.apply(this, [beliefs]) : null
+  }
 })
 
 module.exports = Plan

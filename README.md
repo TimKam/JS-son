@@ -119,7 +119,7 @@ const plansPorter = [
 ]
 ```
 
-Note that an agent can activate its own beliefs (and also plans or any other property it has) in the **body** of its plan (not in a plan *head*).
+Note that an agent can update its own beliefs (and also plans or any other property it has) in a **body** of its plans (not in a plan's *head*).
 For this, simply re-assign the corresponding property, for example as follows:
 
 ```JavaScript
@@ -132,7 +132,7 @@ Plan(
   )
 ```
 Note that it is necessary to use the ``function`` keyword so that *JS-son* can set the scope of the plan body correctly.
-The feature can be activated for an agent by instantiating it with the ``selfUpdatesPossible`` set to ``false``.
+The feature can be deactivated for an agent by instantiating it with the ``selfUpdatesPossible`` parameter set to ``false``.
 
 We instantiate a new agent with the belief set and plans.
 Because we are not making use of  *desires* in this simple belief-plan scenario, we pass an empty object as the agent's desires:

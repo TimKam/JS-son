@@ -10,7 +10,7 @@ const Intentions = require('./Intentions')
                                           (if no function is provided), the preference function
                                           turns all desires into intentions
  * @param {boolean} selfUpdatesPossible If true, agents can update their own belief, plans et cetera
-                                        via the body of their plans. Defaults to ``true``.
+                                        via a body of their plans. Defaults to ``true``.
  * @returns {object} JS-son agent object
  */
 

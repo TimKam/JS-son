@@ -1,4 +1,5 @@
 const Agent = require('../../../src/agent/Agent')
+const Plan = require('../../../src/agent/Plan')
 const Environment = require('../../../src/environment/Environment')
 
 const {
@@ -17,8 +18,11 @@ const {
 
 console.log = jasmine.createSpy('log')
 
+const emptyMessageObject = { human: {}, dog: {} }
+
 describe('Environment / run()', () => {
   const human = new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
+  const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
 
   const state = {
     dogNice: true,
@@ -26,19 +30,19 @@ describe('Environment / run()', () => {
   }
 
   const update = actions => (actions.some(
-    action => action.actions.includes('Here, take some food!')) ? { dogHungry: false } : {}
+    action => action.actions &&
+      action.actions.includes('Here, take some food!')) ? { dogHungry: false } : {}
   )
 
   it('Should process agent actions', () => {
     const environment = new Environment([human], state, update)
     environment.run(1)
-    expect(console.log).toHaveBeenCalledWith({ dogNice: true, dogHungry: false })
+    expect(console.log).toHaveBeenCalledWith(
+      { dogNice: true, dogHungry: false, messages: { human: {} } }
+    )
   })
 
   it('Should allow agent-to-agent interaction', () => {
-    const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
-    // console.log(dog)
-    // const dog = createAgent('dog')
     const updateMAS = actions => {
       const stateUpdate = {}
       actions.forEach(action => {
@@ -67,30 +71,32 @@ describe('Environment / run()', () => {
       dogNice: true,
       dogHungry: true,
       foodAvailable: false,
-      dogRecentlyPraised: false
+      dogRecentlyPraised: false,
+      messages: emptyMessageObject
     }, {
       dogNice: true,
       dogHungry: false,
       foodAvailable: false,
-      dogRecentlyPraised: false
+      dogRecentlyPraised: false,
+      messages: emptyMessageObject
     }]
-    expect(JSON.stringify(history)).toEqual(JSON.stringify(expectedHistory))
+    expect(history).toEqual(expectedHistory)
   })
 
   it('Should terminate after the specified number of iterations', () => {
     const environment = new Environment([human], state, update)
     const history = environment.run(2)
     const expectedHistory = [
-      { dogNice: true, dogHungry: true },
-      { dogNice: true, dogHungry: false },
-      { dogNice: true, dogHungry: false }
+      { dogNice: true, dogHungry: true, messages: { human: {} } },
+      { dogNice: true, dogHungry: false, messages: { human: {} } },
+      { dogNice: true, dogHungry: false, messages: { human: {} } }
     ]
     expect(history).toEqual(expectedHistory)
   })
 
   it('Should allow for the specification of a custom runner function', () => {
     const environment = new Environment(
-      [human],
+      [human, dog],
       state,
       update,
       state => console.log(state),
@@ -98,9 +104,9 @@ describe('Environment / run()', () => {
     )
     const history = environment.run(2)
     const expectedHistory = [
-      { dogNice: true, dogHungry: true },
-      { dogNice: true, dogHungry: false },
-      { dogNice: true, dogHungry: false }
+      { dogNice: true, dogHungry: true, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: false, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: false, messages: emptyMessageObject }
     ]
     expect(history).toEqual(expectedHistory)
   })
@@ -125,30 +131,58 @@ describe('Environment / run()', () => {
       return state
     }
     const history1 = new Environment(
-      [human],
+      [human, dog],
       state,
       update,
       state => console.log(state),
       stateFilter1
     ).run(2)
     const expectedHistory1 = [
-      { dogNice: true, dogHungry: true },
-      { dogNice: true, dogHungry: true },
-      { dogNice: true, dogHungry: true }
+      { dogNice: true, dogHungry: true, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: true, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: true, messages: emptyMessageObject }
     ]
     expect(history1).toEqual(expectedHistory1)
     const history2 = new Environment(
-      [human],
+      [human, dog],
       state,
       update,
       state => console.log(state),
       stateFilter2
     ).run(2)
     const expectedHistory2 = [
-      { dogNice: true, dogHungry: true },
-      { dogNice: true, dogHungry: false },
-      { dogNice: true, dogHungry: false }
+      { dogNice: true, dogHungry: true, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: false, messages: emptyMessageObject },
+      { dogNice: true, dogHungry: false, messages: emptyMessageObject }
     ]
     expect(history2).toEqual(expectedHistory2)
+  })
+
+  it('Should allow for agent-to-agent message passing', () => {
+    const messagePlans = [
+      Plan(_ => true, () => ({ messages: [{ message: 'Hi!', agentId: 'human' }] }))
+    ]
+    const filledMessageObject = {
+      ...emptyMessageObject,
+      human2: {},
+      human: { human2: ['Hi!'] }
+    }
+    const human2 = new Agent('human2', beliefs, desires, messagePlans, preferenceFunctionGen)
+    const env = new Environment(
+      [human, human2, dog],
+      state,
+      update
+    )
+    const history = env.run(2)
+    const expectedHistory = [
+      { dogNice: true, dogHungry: true, messages: filledMessageObject },
+      { dogNice: true, dogHungry: false, messages: filledMessageObject },
+      { dogNice: true, dogHungry: false, messages: filledMessageObject }
+    ]
+    expect(history).toEqual(expectedHistory)
+    expect(env.agents.human.beliefs.messages.human2).toContain('Hi!')
+    expect(env.agents.human.beliefs.messages.human2.length).toEqual(1)
+    expect(env.agents.human2.beliefs.messages.human2.length).toEqual(0)
+    expect(env.agents.dog.beliefs.messages.human2.length).toEqual(0)
   })
 })

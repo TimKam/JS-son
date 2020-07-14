@@ -23,6 +23,7 @@ const { updateMAS } = require('../mocks/environment')
 describe('Integration: belief-plan approach', () => {
   const human = new Agent('human', beliefs, desires, plans, preferenceFunctionGen)
   const dog = new Agent('dog', dogBeliefs, dogDesires, dogPlans, dogPreferenceFunctionGen)
+  const emptyMessageObject = { human: {}, dog: {} }
 
   const state = {
     dogNice: true,
@@ -39,12 +40,14 @@ describe('Integration: belief-plan approach', () => {
       dogNice: true,
       dogHungry: true,
       foodAvailable: false,
-      dogRecentlyPraised: false
+      dogRecentlyPraised: false,
+      messages: emptyMessageObject
     }, {
       dogNice: true,
       dogHungry: false,
       foodAvailable: false,
-      dogRecentlyPraised: false
+      dogRecentlyPraised: false,
+      messages: emptyMessageObject
     }]
     expect(history).toEqual(expectedHistory)
   })

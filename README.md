@@ -482,6 +482,30 @@ Finally, we run 50 iterations of the scenario:
 environment.run(50)
 ```
 
+## Messaging
+JS-son agents can send "private" messages to any other JS-son agent, which the environment will then relay to this agent only.
+Agents can send these messages in the same way they register the execution of an action as the result of a plan.
+For example, in the plan below, an agent sends the message ``'Hi!'`` to the agent with the ID ``alice``:
+
+```JavaScript
+const messagePlans = [
+  Plan(_ => true, () => ({ messages: [{ message: 'Hi!', agentId: 'alice' }] }))
+]
+```
+
+Assuming that the sending agent has the ID ``bob``, the agent ``alice`` will receive the following belief update:
+
+```JavaScript
+beliefs = {
+  ...beliefs,
+  messages: {
+    bob: ['Hi!']
+  }
+}
+```
+
+Note that messages do not need to be strings, but can be of any type, for example objects.
+
 ## Further Examples
 
 ### Data Science

@@ -1,0 +1,19 @@
+{
+  "name": "js-son-distributed-example",
+  "version": "0.0.1",
+  "description": "Distributed MAS example of the JS-son library",
+  "main": "index.js",
+  "dependencies": {
+    "@node-wot/binding-coap": "^0.7.0",
+    "@node-wot/core": "^0.7.0",
+    "js-son-agent": "^0.0.10"
+  },
+  "devDependencies": {
+    "@node-wot/cli": "^0.7.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause"
+}

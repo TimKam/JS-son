@@ -51,13 +51,25 @@ WoT.produce({
       description: 'Is true if robot is running/working on a production line',
       observable: true,
       readOnly: true
+    },
+    packingHistory: {
+      type: 'array',
+      description: 'Logs for each tick if a new item has been packed (1) are not (1)',
+      observable: true,
+      readOnly: true
+    },
+    scrapHistory: {
+      type: 'array',
+      description: 'Logs for each item a zero if it is not scrapped and a 1 if it is scrapped',
+      observable: true,
+      readOnly: true
     }
   },
   actions: {
     setScrapRateGoal: {
       description: 'Set the speed of the production line. A speed of 0 means the production line stops.',
       uriVariables: {
-        speed: { 'type': 'integer', 'minimum': 0, 'maximum': 10 }
+        rate: { 'type': 'number', 'minimum': 0, 'maximum': 1 }
       }
     },
     stop: {
@@ -68,18 +80,35 @@ WoT.produce({
     }
   }
 }).then(thing => {
+  // standard action handlers
+  thing.setActionHandler('stop', () => {
+    thing.writeProperty('isRunning', false)
+  })
+
+  thing.setActionHandler('start', () => {
+    thing.writeProperty('isRunning', true)
+  })
+
+  thing.setActionHandler('setScrapRateGoal', (_, options) => {
+    try {
+      const scrapRate = options['uriVariables']['speed']
+      console.log(`Setting scrap rate goal to ${scrapRate}`)
+      if (scrapRate >= 0 && scrapRate <= 1) thing.writeProperty('currentSpeed', scrapRate)
+    } catch (error) {
+      console.error(error)
+    }
+  })
+
   // implement assembly line robot agent
-  const beliefs = {
-    ...Belief('isRunning', true),
-    ...Belief('scrapRateGoal', 0.025),
-    ...Belief('scrapRate', 0),
-    ...Belief('currentProductionSpeed', 0),
-    ...Belief('overallPackingSpeed', 0),
-    ...Belief('isAssignedToBrokenLine', false),
-    ...Belief('isAssignedToJammedLine', false),
-    ...Belief('packingHistory', []),
-    ...Belief('scrapHistory', [])
-  }
+  thing.writeProperty('isRunning', true)
+  thing.writeProperty('scrapRateGoal', 0.025)
+  thing.writeProperty('scrapRate', 0)
+  thing.writeProperty('currentProductionSpeed', 0)
+  thing.writeProperty('overallPackingSpeed', 0)
+  thing.writeProperty('isAssignedToBrokenLine', false)
+  thing.writeProperty('isAssignedToJammedLine', false)
+  thing.writeProperty('packingHistory', [])
+  thing.writeProperty('scrapHistory', [])
 
   const plans = [
     Plan(
@@ -136,7 +165,7 @@ WoT.produce({
     ),
     Plan(
       beliefs => (
-        beliefs.isAssignedToJammedLine ||
+        !beliefs.isAssignedToJammedLine ||
         !beliefs.isRunning ||
         (beliefs.scrapRate > beliefs.scrapRateGoal && beliefs.currentProductionSpeed > 1)
       ) && beliefs.currentProductionSpeed > 0,
@@ -159,8 +188,7 @@ WoT.produce({
     )
   ]
 
-  const agentId = 'robot'
-  const robot = new Agent(agentId, beliefs, {}, plans)
+  const robot = thingToAgent(thing, plans)
   setInterval(() => {
     // eslint-disable-next-line
     WoTHelpers.fetch('http://localhost:8080/Production_line').then(async (td) => {
@@ -170,14 +198,27 @@ WoT.produce({
       const currentProductionSpeed = await productionLine.readProperty('currentSpeed')
       const isAssignedToBrokenLine = await productionLine.readProperty('isBroken')
       const isAssignedToJammedLine = await productionLine.readProperty('isJammed')
+      const scrapRateGoal = await thing.readProperty('scrapRateGoal')
       robot.next({
         thing,
         productionLine,
         itemsOnLine,
         currentProductionSpeed,
         isAssignedToBrokenLine,
-        isAssignedToJammedLine
+        isAssignedToJammedLine,
+        scrapRateGoal
       })
     })
   }, 1000)
 })
+
+function thingToAgent (thing, plans) {
+  const beliefs =
+    Object.keys(thing.properties).map(
+      propertyKey =>
+        Belief(
+          thing.properties[propertyKey].getName(),
+          thing.properties[propertyKey].getState().value)).reduce((a, b) => ({ ...a, ...b })
+    )
+  return new Agent(thing.title, beliefs, {}, plans)
+}

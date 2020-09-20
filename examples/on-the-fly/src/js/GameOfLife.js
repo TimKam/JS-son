@@ -36,7 +36,7 @@ const plans = [
         neighborActivity === 3
     },
     () => ({ nextRound: 'active' })
-  ),
+  )/*,
   Plan(
     beliefs => {
       const neighborActivity = determineNeighborActivity(beliefs.index, beliefs.activityArray)
@@ -45,7 +45,7 @@ const plans = [
         !neighborActivity === 3
     },
     () => ({ nextRound: 'inActive' })
-  )
+  )*/
 ]
 
 // generates (pseudo-)random initial activity state (active or inactive)

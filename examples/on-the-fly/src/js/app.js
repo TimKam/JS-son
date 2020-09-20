@@ -11,6 +11,8 @@ import '../css/app.css'
 import routes from './routes.js'
 // Game of Life
 import GameOfLife from './GameOfLife'
+// Audio interface
+import audioInterface from './audioInterface'
 
 window.determineNeighborActivity = (index, activityArray) => {
   const leftNeighbors = index % 10 === 0
@@ -62,15 +64,6 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
         neighborActivity === 3
     },
     () => ({ nextRound: 'active' })
-  ),
-  Plan(
-    beliefs => {
-      const neighborActivity = determineNeighborActivity(beliefs.index, beliefs.activityArray)
-      const isActive = beliefs.activityArray[beliefs.index]
-      return !(isActive && neighborActivity >= 2 && neighborActivity < 4) &&
-        !neighborActivity === 3
-    },
-    () => ({ nextRound: 'inActive' })
   )
 ]
           `
@@ -78,7 +71,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
         language: 'javascript'
       })
       window.gameOfLife = GameOfLife()
-      window.editor.onDidType(() => {
+      window.editor.onDidChangeModelContent(() => {
         const tPlans = window.editor.getValue()
         let evalSuccess = false
         try {
@@ -103,6 +96,7 @@ var app = new Framework7({ // eslint-disable-line no-unused-vars
         }
       }, 500)
     })
+    audioInterface()
   },
   // App routes
   routes: routes

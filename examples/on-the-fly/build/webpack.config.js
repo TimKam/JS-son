@@ -1,7 +1,7 @@
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -159,11 +159,6 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(env),
       'process.env.TARGET': JSON.stringify(target),
     }),
-  new MonacoWebpackPlugin({
-    // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
-    languages: ['javascript', 'css', 'html', 'typescript', 'json']
-  }),
-
 
     ...(env === 'production' ? [
       // Production only plugins
@@ -196,14 +191,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'css/app.css',
     }),
-    new CopyWebpackPlugin([
+    new CopyPlugin(
       {
-        from: resolvePath('src/static'),
-        to: resolvePath('www/static'),
-      },
-
-    ]),
-
-
+        patterns: [
+          { from: 'src/static', to: 'www/static' },
+        ],
+      }
+    ),
   ],
 };

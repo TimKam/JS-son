@@ -58,3 +58,6 @@
   left: 0;
 }
 
+.restart-button {
+  z-index: 999;
+}

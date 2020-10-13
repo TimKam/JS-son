@@ -547,7 +547,7 @@ Contributions that change this are welcome!
 ## Testing
 The project uses [Jasime](https://jasmine.github.io/2.0/node.html) for testing.
 Run the tests with ``npm test``.
-The tests also run on Travis-CI.
+The tests also run on CircleCI.
 
 ## Documentation
 *JS-son* is documented with [Sphinx](http://www.sphinx-doc.org/en/master/).

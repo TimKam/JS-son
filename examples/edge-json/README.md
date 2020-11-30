@@ -28,7 +28,7 @@ In particular, we adjust the JS-son core code as follows:
   several planning objectives can be accomplished. 
 
 * We manage plans in a global plans library; the plan of each agent is in fact a pointer to a plan
-  in this library.
+in this library.
 
 * We add a configuration variable for the environment that deactivates storing the MAS's history
   by default.
@@ -101,3 +101,73 @@ To deploy and execute Edge JS-son, we proceed as follows:
    paste it into the Web IDE, and click the **Send to Espruino** button.
 
 We're done, the *room* MAS runs on the Espruino.
+
+## Running a Distributed MAS
+Next, let us adjust the MAS so that it runs distributed, with two agents (and the environment) on
+the Pixl.js and one agent in our web browser.
+For this, we can conveniently rely on the following:
+
+* Espruino supports
+  [interacting with a web browser via Web Bluetooth](https://www.espruino.com/Web%20Bluetooth).
+  We have already used this feature when deploying our code; we can also using it write code that
+  sends messages to a JavaScript application that runs on our browser.
+
+* [Another JS-son tutorial](https://github.com/TimKam/JS-son/tree/master/examples/distributed)
+  already shows how to implement the *room* MAS in a distributed manner; we can learn from this
+  example, and merely need to apply the same approach to a different set of technologies.
+
+We start by creating a simple HTML page that contains a button to deploy part of the MAS to the
+Pixl.js Espruino device. The same page will execute one of the MAS' agents:
+
+```html
+<html>
+ <head>
+   <style>
+     body { margin:0;  }
+     h1 {
+       display:block;;
+       margin: auto;
+       width: 50%;
+       padding: 10px;
+     }
+     button#deploy, div.console {
+       display:block;;
+       margin: auto;
+       width: 20%;
+       padding: 10px;
+     }
+     div.console {
+       display:block;;
+       margin: auto;
+       padding: 10px;
+     }
+   </style>    
+ </head>
+ <body>
+   <h1>Espruino - Distributed Multi-Agent System Demo</h1>
+   <button id="deploy">Deploy to Pixl.js</button> <br><br>
+   <div class="console" ><strong>Open console to view log.</strong></div>
+  <script src="https://www.puck-js.com/puck.js"></script>
+  <script src="./EdgeJSson.js"></script>
+  <script src="./client.js"></script>
+ </body>
+</html>
+```
+
+...
+
+Before we can run the MAS, we need to globally install the ``http-server`` npm package:
+
+```
+npm install -g http-server
+```
+
+This allows us to run the web application as if it was hosted by a web server; otherwise, some of
+the features our application uses would be blocked by the browser's security functionality.
+
+We start the web application by running ``http-server`` in the root directory. Open
+``http://127.0.0.1:8080`` and click the **Deploy to Pixl.js** button. Once you have deployed the
+code, open your browser's console and see the MAS's logs being printed out. More concise messages
+are printed to the Pixl.js screen.
+
+

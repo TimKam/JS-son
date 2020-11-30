@@ -24,6 +24,15 @@ function Agent (id, beliefs, plans) {
   this.start = () => (this.isActive = true);
 }
 
+function RemoteAgent (id, beliefs, next) {
+  this.id = id;
+  this.beliefs = beliefs;
+  this.isActive = true;
+  this.next = next;
+  this.stop = () => (this.isActive = false);
+  this.start = () => (this.isActive = true);
+}
+
 function Belief (id, value) {
   const belief = {};
   belief[id] = value;

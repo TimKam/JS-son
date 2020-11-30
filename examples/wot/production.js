@@ -21,7 +21,7 @@ WoT.produce({
     'https://www.w3.org/2019/wot/td/v1'
   ],
   properties: {
-    currentSpeed: {
+    speed: {
       type: 'integer',
       description: 'Current speed of the production line',
       observable: true,
@@ -58,13 +58,13 @@ WoT.produce({
     }
   }
 }).then(thing => {
-  thing.writeProperty('currentSpeed', 1)
+  thing.writeProperty('speed', 1)
 
   thing.setActionHandler('setSpeed', (_, options) => {
     try {
       speed = options['uriVariables']['speed']
       console.log(`Setting speed to ${speed}`)
-      if (speed >= 0 && speed <= 10) thing.writeProperty('currentSpeed', speed)
+      if (speed >= 0 && speed <= 10) thing.writeProperty('speed', speed)
     } catch (error) {
       console.error(error)
     }

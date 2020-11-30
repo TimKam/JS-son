@@ -3,7 +3,7 @@ const { Belief, Plan, Agent } = require('js-son-agent')
 
 // eslint-disable-next-line
 WoT.produce({
-  title: 'robot',
+  title: 'Robot',
   description: 'A mock of a WoT assembly line robot for packaging and quality control',
   support: 'https://github.com/TimKam/JS-son',
   '@context': [
@@ -91,9 +91,9 @@ WoT.produce({
 
   thing.setActionHandler('setScrapRateGoal', (_, options) => {
     try {
-      const scrapRate = options['uriVariables']['speed']
+      const scrapRate = options['uriVariables']['scrapRate']
       console.log(`Setting scrap rate goal to ${scrapRate}`)
-      if (scrapRate >= 0 && scrapRate <= 1) thing.writeProperty('currentSpeed', scrapRate)
+      if (scrapRate >= 0 && scrapRate <= 1) thing.writeProperty('scrapRate', scrapRate)
     } catch (error) {
       console.error(error)
     }
@@ -117,21 +117,21 @@ WoT.produce({
       function (beliefs) {
         console.log({
           itemsOnLine: beliefs.itemsOnLine,
-          currentSpeed: beliefs.currentProductionSpeed,
+          speed: beliefs.currentProductionSpeed,
           overallPackagingSpeed: beliefs.overallPackingSpeed,
           scrapRate: beliefs.scrapRate
         })
-        beliefs.thing.writeProperty('currentProductionSpeed', beliefs.currentProductionSpeed)
-        beliefs.thing.writeProperty('isAssignedToBrokenLine', beliefs.isAssignedToBrokenLine)
-        beliefs.thing.writeProperty('isAssignedToJammedLine', beliefs.isAssignedToJammedLine)
+        this.beliefs.thing.writeProperty('currentProductionSpeed', beliefs.currentProductionSpeed)
+        this.beliefs.thing.writeProperty('isAssignedToBrokenLine', beliefs.isAssignedToBrokenLine)
+        this.beliefs.thing.writeProperty('isAssignedToJammedLine', beliefs.isAssignedToJammedLine)
         this.beliefs.packingHistory.push(0)
         this.beliefs.scrapHistory.push(0)
         this.beliefs.overallPackingSpeed =
           beliefs.packingHistory.reduce((a, b) => a + b) / beliefs.packingHistory.length
         this.beliefs.scrapRate =
           beliefs.scrapHistory.reduce((a, b) => a + b) / beliefs.scrapHistory.length
-        beliefs.thing.writeProperty('overallPackingSpeed', this.beliefs.overallPackingSpeed)
-        beliefs.thing.writeProperty('scrapRate', this.beliefs.overallPackingSpeed)
+        this.beliefs.thing.writeProperty('overallPackingSpeed', this.beliefs.overallPackingSpeed)
+        this.beliefs.thing.writeProperty('scrapRate', this.beliefs.scrapRate)
       }
     ),
     Plan(
@@ -165,8 +165,7 @@ WoT.produce({
     ),
     Plan(
       beliefs => (
-        !beliefs.isAssignedToJammedLine ||
-        !beliefs.isRunning ||
+        !(beliefs.isAssignedToJammedLine || beliefs.isRunning) &&
         (beliefs.scrapRate > beliefs.scrapRateGoal && beliefs.currentProductionSpeed > 1)
       ) && beliefs.currentProductionSpeed > 0,
       // slow down production line
@@ -177,7 +176,7 @@ WoT.produce({
       )
     ),
     Plan(
-      beliefs => (!beliefs.isAssignedToJammedLine || !beliefs.isAssignedToBrokenLine) &&
+      beliefs => !(beliefs.isAssignedToJammedLine || beliefs.isAssignedToBrokenLine) &&
         beliefs.scrapRate < beliefs.scrapRateGoal && beliefs.currentProductionSpeed < 10,
       // speed up production line
       beliefs => beliefs.productionLine.invokeAction(
@@ -195,7 +194,8 @@ WoT.produce({
       // eslint-disable-next-line
       let productionLine = await WoT.consume(td)
       const itemsOnLine = await productionLine.readProperty('itemsOnLine')
-      const currentProductionSpeed = await productionLine.readProperty('currentSpeed')
+      const currentProductionSpeed = await productionLine.readProperty('speed')
+      console.log(currentProductionSpeed)
       const isAssignedToBrokenLine = await productionLine.readProperty('isBroken')
       const isAssignedToJammedLine = await productionLine.readProperty('isJammed')
       const scrapRateGoal = await thing.readProperty('scrapRateGoal')

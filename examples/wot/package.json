@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "wot-servient"
+    "start": "node ./node_modules/@node-wot/cli/dist/cli.js"
   },
   "author": "Timotheus Kampik",
   "license": "BSD-2-Clause"

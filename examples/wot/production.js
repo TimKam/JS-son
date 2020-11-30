@@ -14,7 +14,7 @@ let temperature
 
 // eslint-disable-next-line
 WoT.produce({
-  title: 'Production_line',
+  title: 'production_line',
   description: 'A WoT production line mock',
   support: 'https://github.com/TimKam/JS-son',
   '@context': [
@@ -90,7 +90,7 @@ WoT.produce({
   setInterval(() => {
     speedHistory.push(speed)
     // eslint-disable-next-line
-    WoTHelpers.fetch('http://localhost:8080/Thermometer').then(async (td) => {
+    WoTHelpers.fetch('http://localhost:8080/thermometer').then(async (td) => {
       // eslint-disable-next-line
       let thermometer = await WoT.consume(td)
       temperature = await thermometer.invokeAction(

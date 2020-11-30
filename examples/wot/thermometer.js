@@ -5,7 +5,7 @@
 */
 // eslint-disable-next-line
 WoT.produce({
-  title: 'Thermometer',
+  title: 'thermometer',
   description: 'A WoT thermometer mock',
   support: 'https://github.com/TimKam/JS-son',
   '@context': [

@@ -3,7 +3,7 @@ const { Belief, Plan, Agent } = require('js-son-agent')
 
 // eslint-disable-next-line
 WoT.produce({
-  title: 'Robot',
+  title: 'robot',
   description: 'A mock of a WoT assembly line robot for packaging and quality control',
   support: 'https://github.com/TimKam/JS-son',
   '@context': [
@@ -191,7 +191,7 @@ WoT.produce({
   const robot = thingToAgent(thing, plans)
   setInterval(() => {
     // eslint-disable-next-line
-    WoTHelpers.fetch('http://localhost:8080/Production_line').then(async (td) => {
+    WoTHelpers.fetch('http://localhost:8080/production_line').then(async (td) => {
       // eslint-disable-next-line
       let productionLine = await WoT.consume(td)
       const itemsOnLine = await productionLine.readProperty('itemsOnLine')

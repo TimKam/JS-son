@@ -1,9 +1,10 @@
 // import JS-son
-const { Belief, Plan, Agent } = require('js-son-agent')
+const { Plan } = require('js-son-agent')
+const { thingToAgent, updateThingProperties } = require('js-son-wot')
 
 // eslint-disable-next-line
 WoT.produce({
-  title: 'Robot',
+  title: 'robot',
   description: 'A mock of a WoT assembly line robot for packaging and quality control',
   support: 'https://github.com/TimKam/JS-son',
   '@context': [
@@ -121,17 +122,23 @@ WoT.produce({
           overallPackagingSpeed: beliefs.overallPackingSpeed,
           scrapRate: beliefs.scrapRate
         })
-        this.beliefs.thing.writeProperty('currentProductionSpeed', beliefs.currentProductionSpeed)
-        this.beliefs.thing.writeProperty('isAssignedToBrokenLine', beliefs.isAssignedToBrokenLine)
-        this.beliefs.thing.writeProperty('isAssignedToJammedLine', beliefs.isAssignedToJammedLine)
         this.beliefs.packingHistory.push(0)
         this.beliefs.scrapHistory.push(0)
         this.beliefs.overallPackingSpeed =
           beliefs.packingHistory.reduce((a, b) => a + b) / beliefs.packingHistory.length
         this.beliefs.scrapRate =
           beliefs.scrapHistory.reduce((a, b) => a + b) / beliefs.scrapHistory.length
-        this.beliefs.thing.writeProperty('overallPackingSpeed', this.beliefs.overallPackingSpeed)
-        this.beliefs.thing.writeProperty('scrapRate', this.beliefs.scrapRate)
+        updateThingProperties(
+          this.beliefs.thing,
+          this.beliefs,
+          [
+            'currentProductionSpeed',
+            'isAssignedToBrokenLine',
+            'isAssignedToJammedLine',
+            'overallPackingSpeed',
+            'scrapRate'
+          ]
+        )
       }
     ),
     Plan(
@@ -188,6 +195,7 @@ WoT.produce({
   ]
 
   const robot = thingToAgent(thing, plans)
+  thing.expose().then(() => console.info(`${thing.getThingDescription().title} ready`))
   setInterval(() => {
     // eslint-disable-next-line
     WoTHelpers.fetch('http://localhost:8080/production_line').then(async (td) => {
@@ -198,27 +206,14 @@ WoT.produce({
       console.log(currentProductionSpeed)
       const isAssignedToBrokenLine = await productionLine.readProperty('isBroken')
       const isAssignedToJammedLine = await productionLine.readProperty('isJammed')
-      const scrapRateGoal = await thing.readProperty('scrapRateGoal')
       robot.next({
         thing,
         productionLine,
         itemsOnLine,
         currentProductionSpeed,
         isAssignedToBrokenLine,
-        isAssignedToJammedLine,
-        scrapRateGoal
+        isAssignedToJammedLine
       })
     })
   }, 1000)
 })
-
-function thingToAgent (thing, plans) {
-  const beliefs =
-    Object.keys(thing.properties).map(
-      propertyKey =>
-        Belief(
-          thing.properties[propertyKey].getName(),
-          thing.properties[propertyKey].getState().value)).reduce((a, b) => ({ ...a, ...b })
-    )
-  return new Agent(thing.title, beliefs, {}, plans)
-}

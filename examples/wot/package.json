@@ -5,9 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "@node-wot/binding-coap": "^0.7.0",
+    "@node-wot/cli": "^0.7.1",
     "@node-wot/core": "^0.7.0",
     "js-son-agent": "^0.0.10",
-    "@node-wot/cli": "^0.7.1"
+    "js-son-wot": "file:js-son-wot"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

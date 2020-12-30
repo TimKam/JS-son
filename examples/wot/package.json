@@ -8,7 +8,9 @@
     "@node-wot/cli": "^0.7.1",
     "@node-wot/core": "^0.7.0",
     "js-son-agent": "^0.0.10",
-    "js-son-wot": "file:js-son-wot"
+    "js-son-wot": "file:js-son-wot",
+    "robot-interface": "file:robot-interface",
+    "config": "file:config"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

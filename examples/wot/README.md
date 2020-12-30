@@ -1,7 +1,8 @@
 # Web of Things Scripting API Integration
 The [Web of Things (WoT) Scripting API](https://www.w3.org/TR/wot-scripting-api/) is an API specification draft for exposing, consuming and discovering *Things* (IoT devices) on the Web.
 This project presents an example integration of JS-son and a WoT Scripting API implementation.
-Running JS-son agents on Things can be useful because it constitutes a lightweight approach to instill goal-oriented behavior into Things (where the goal-driven program runs directly *on* a Thing).
+One JS-son agent runs directly on the WOT Scripting API gateway, controlling an industrial robot arm.
+Anther JS-son agent runs remotely on a constraint device. The agents interact with each other, as well as with some *Things* (sensors) in their environment.
 
 ## Example Scenario
 The implementation presents the following (fictitious) example scenario.

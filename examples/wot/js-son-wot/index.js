@@ -22,7 +22,7 @@ module.exports = {
    * Takes a WoT Scripting API `thing`, a JS-son belief base and a list of thing properties and
    * updates the corresponding thing properties based on the belief base's beliefs with the same
    * identifier
-   * @param {thing} thing WoT Scripting API `thing` 
+   * @param {thing} thing WoT Scripting API `thing`
    * @param {[plan]]} plans Array of JS-son plans
    * @returns {agent} JS-son agent
   */

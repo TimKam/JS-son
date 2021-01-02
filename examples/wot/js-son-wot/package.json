@@ -13,7 +13,7 @@
     "IoT",
     "agents"
   ],
-  "author": "Timotheus Kampik",
+  "author": "Anonymized",
   "license": "MIT",
   "dependencies": {
     "js-son-agent": "0.0.10"

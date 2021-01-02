@@ -16,6 +16,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./node_modules/@node-wot/cli/dist/cli.js"
   },
-  "author": "Timotheus Kampik",
+  "author": "Anonymized",
   "license": "BSD-2-Clause"
 }

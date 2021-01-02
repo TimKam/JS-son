@@ -123,6 +123,7 @@ WoT.produce({
             'assemblyHistory'
           ]
         )
+        // TODO: get other thing properties and adjust beliefs accordingly
         if (!this.beliefs.hasStarted) {
           start(url, user).then(() => {
             this.beliefs.idle = true

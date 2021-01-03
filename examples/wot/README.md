@@ -50,7 +50,7 @@ npm install
 To run the example, start the servient by executing ``npm run start`` on your command line.
 
 ## Usage
-To discover the things and agents that the servient exposes, open the WoT Scripting API Gateway, *e.g., at `http://127.0.0.1:8080`.
+To discover the things and agents that the servient exposes, open the WoT Scripting API Gateway, *e.g.*, at `http://127.0.0.1:8080`.
 Navigating the gateway interface allows you (or any other human or AI agent) to discover all ways of interacting with our multi-agent system.
 Below are some examples (assuming `http://127.0.0.1:8080` as the gateway URL):
 

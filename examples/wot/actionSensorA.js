@@ -1,7 +1,12 @@
 /**
  * This script implements a mock of a "thermometer" Thing that can be set to a specific temperature.
 */
-// helper:
+// helper, see: https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+/**
+ * Hashes a given string, using a primitive/naive algorithm
+ * @param {string} s String that should be hashed
+ * @returns {string} Hashed string
+ */
 const hashCode = s => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)
 // eslint-disable-next-line
 WoT.produce({
@@ -29,11 +34,11 @@ WoT.produce({
   thing.setActionHandler('triggerAssembly', () => {
     try {
       const configuration = 'A'
-      const id = `${hashCode(new Date())}-${configuration}`
-      console.log(`Adding item to thing-internal queue: id: ${id}-${id}, configuration: ${configuration}`)
-      thing.readProperty('queue').then(queue => {
-        queue.push({ configuration, id })
-        thing.writeProperty('queue', queue)
+      const id = `${hashCode(`${new Date()}`)}-${configuration}`
+      console.log(`Adding item to thing-internal queue: id: ${id}, configuration: ${configuration}`)
+      thing.readProperty('history').then(history => {
+        history.push({ configuration, id })
+        thing.writeProperty('history', history)
       })
     } catch (error) {
       console.error(error)

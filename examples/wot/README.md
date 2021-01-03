@@ -20,22 +20,26 @@ To configure the demonstration, go to the project's root directory, open the ``c
 Add the following lines of code to the file:
 
 ```JavaScript
-const url = '<url>'
+const robotUrl = '<robotUrl>'
 
 const user = {
-  name: '<url>',
-  email: '<url>'
+  name: '<name>',
+  email: '<email>'
 }
+
+const gatewayUrl = '<gatewayUrl>'
 
 module.exports = { url, user }
 ```
 Note that you should replace:
 
-* ``<url>`` with the url to a [leubot](https://github.com/Interactions-HSG/leubot)-enabled PhantomX AX-12 Reactor Robot Arm.
+* ``<robotUrl>`` with the url to a [leubot](https://github.com/Interactions-HSG/leubot)-enabled PhantomX AX-12 Reactor Robot Arm.
 
-* ``name`` with the name of the user that is to be registered at the leubot interface. 
+* ``<name>`` with the name of the user that is to be registered at the leubot interface. 
 
-* ``email`` with the email address of the user that is to be registered.
+* ``<email>`` with the email address of the user that is to be registered.
+
+* ``<gatewayUrl>`` with the url at which your WoT Scripting API gateway is available.
 
 Then, go back to the project's root directory and install the project's dependencies:
 
@@ -52,14 +56,25 @@ Below are some examples (assuming `http://127.0.0.1:8080` as the gateway URL):
 
 * Add a new item of configuration ``A`` to the robot's queue (which in turns triggers the robot to perform movements that mock the assembly of the item, if the robot is running and no other items are waiting to be processed before): `curl --location --request POST 'http://127.0.0.1:8080/robot/actions/addToQueue?configuration=A&id=3'`
 
-* Triggering action sensor ``A`` (which in turn adds a new item of configuration ``A`` to the robot's queue): TODO
-
-* Registering a temperature measurement of 60°C (which in turn causes the robot to decrease its speed): TODO
+* Triggering action sensor ``A`` (which in turn adds a new item of configuration ``A`` to the robot's queue): `curl --location --request POST 'http://127.0.0.1:8080/action_sensor_a/actions/triggerAssembly'`
 
 ## Advanced Setup - Espruino Device Integration
-TODO
+This project provides code that can be used to integrate [Espruino](https://www.espruino.com) devices into our WoT setup.
+To achieve this, proceed as follows.
+
+Create a ``config.js`` in the ``espruino`` directory of the project. Add the following content:
+
+  ```JavaScript
+  var gatewayUrl = '<gatewayUrl>'
+  ```
+
+Replace ``<gatewayUrl>`` with the url at which your WoT Scripting API gateway is available.
+
+Install the Node.js ``http-server`` module globally: ``npm install -g http-server``.
+Then, run ``http-server ./espruino -p=8081``.
 
 ## Advanced Usage - Espruino Device Integration
-TODO
+Open ``http://127.0.0.1:8081``.
+From there, you can deploy things and agents to Esprunio [Puck.js](http://www.espruino.com/Puck.js) and [Pixl.js](http://www.espruino.com/Pixl.js) devices, respectively.
 
 

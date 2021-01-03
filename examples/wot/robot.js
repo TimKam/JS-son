@@ -1,11 +1,10 @@
 // import dependencies
-const process = require('process')
 const { Plan } = require('js-son-agent')
 const { thingToAgent, updateThingProperties } = require('js-son-wot')
-const { start, assemble } = require('robot-interface')
+const { start, assemble, setWristRotation } = require('robot-interface')
 
 // configure robot API
-const { url, user } = require('config')
+const { robotUrl, user, gatewayUrl } = require('config')
 
 // eslint-disable-next-line
 WoT.produce({
@@ -123,30 +122,93 @@ WoT.produce({
             'assemblyHistory'
           ]
         )
-        // TODO: get other thing properties and adjust beliefs accordingly
+        // Start robot if necessary
         if (!this.beliefs.hasStarted) {
-          start(url, user).then(() => {
-            this.beliefs.idle = true
+          start(robotUrl, user).then(() => {
+            this.beliefs.isIdle = true
             this.beliefs.hasStarted = true
           })
+        }
+        // Get thermometer measurements and update beliefs accordingly
+        try {
+          // eslint-disable-next-line
+          WoTHelpers.fetch(`${gatewayUrl}/thermometer`).then(async (td) => {
+            // eslint-disable-next-line
+            const thermometer = await WoT.consume(td)
+            const temperature = await thermometer.readProperty('temperature')
+            this.beliefs.temperature = temperature
+          })
+        } catch (error) {
+          console.log('Thermometer measurements not available')
+        }
+        // Get assembly trigger updates and update beliefs accordingly
+        try {
+          // eslint-disable-next-line
+          WoTHelpers.fetch(`${gatewayUrl}/action_sensor_a`).then(async (td) => {
+            // eslint-disable-next-line
+            const sensorA = await WoT.consume(td)
+            const sensorAHistory = await sensorA.readProperty('history')
+            const newItems = sensorAHistory.filter(itemX =>
+              !this.beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
+            this.beliefs.thing.readProperty('queue').then(queue => {
+              const updatedQueue = queue.concat(newItems)
+              this.beliefs.queue = updatedQueue
+            })
+          })
+        } catch (error) {
+          console.log('action_sensor_a not available')
+        }
+        try {
+        // eslint-disable-next-line
+        WoTHelpers.fetch(`${gatewayUrl}/action_sensor_b`).then(async (td) => {
+          // eslint-disable-next-line
+            const sensorB = await WoT.consume(td)
+            const sensorBHistory = await sensorB.readProperty('history')
+            const newItems = sensorBHistory.filter(itemX =>
+              !this.beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
+            this.beliefs.thing.readProperty('queue').then(queue => {
+              const updatedQueue = queue.concat(newItems)
+              this.beliefs.queue = updatedQueue
+            })
+          })
+        } catch (error) {
+          console.log('action_sensor_b not available')
         }
       }
     ),
     Plan(
-      beliefs => beliefs.isRunning && beliefs.queue.length > 0 && beliefs.idle,
+      beliefs => beliefs.isRunning && beliefs.queue.length > 0 && beliefs.isIdle,
       // assemble next item in queue and remove item from queue
       function () {
         const item = this.beliefs.queue.shift()
         const configuration = item.configuration
         assemble(configuration, 3000 / this.beliefs.speed).then(
           function () {
-            this.beliefs.idle = true
+            this.beliefs.isIdle = true
             this.beliefs.assemblyHistory.push(item)
           }.bind(this)
         )
       }
+    ),
+    Plan(
+      beliefs => beliefs.isRunning && beliefs.temperature && beliefs.temperature < 60,
+      // Set speed to normal
+      function () {
+        this.beliefs.speed = 1
+      }
+    ),
+    Plan(
+      beliefs => beliefs.isRunning && beliefs.temperature && beliefs.temperature > 60,
+      // Slow down or stop robot
+      function () {
+        const temperatureExcessDelta = this.beliefs.temperature - 60
+        if (temperatureExcessDelta > 20) {
+          this.beliefs.isRunning = false
+        } else {
+          this.beliefs.speed = 1 - (temperatureExcessDelta / 100) * 4
+        }
+      }
     )
-    // TODO: set speed based on temperature
   ]
 
   const robot = thingToAgent(thing, plans)

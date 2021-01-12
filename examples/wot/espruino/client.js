@@ -1,6 +1,7 @@
 /* eslint semi: 0 */
 const deployPuckA = document.getElementById('deploy-puck-a')
 const deployPuckB = document.getElementById('deploy-puck-b')
+const deployPixl = document.getElementById('deploy-pixl')
 // Called when we get a line of data
 function onLine (value) {
   console.log(`Received: ${value}`)
@@ -13,16 +14,19 @@ function onLine (value) {
 
 var global = window
 
-// When clicked, connect or disconnect
+// When clicked, connect & deploy
 var connection
 deployPuckA.addEventListener('click', function () {
-  onClick('a')
+  onPuckClick('a')
 })
 deployPuckB.addEventListener('click', function () {
-  onClick('b')
+  onPuckClick('b')
+})
+deployPixl.addEventListener('click', function () {
+  onPixlClick()
 })
 
-function onClick (config) {
+function onPuckClick (config) {
   if (connection) {
     connection.close()
     connection = undefined
@@ -46,6 +50,45 @@ function onClick (config) {
       }
     })
     deployPuckScripts(config)
+  })
+}
+
+async function onPixlClick () {
+  if (connection) {
+    connection.close()
+    connection = undefined
+  }
+  Puck.connect(async function (c) {
+    if (!c) {
+      window.alert('Couldn\'t connect.')
+      return
+    }
+    const edgeJSsonScript = await getScript('./edge-json/EdgeJSson.js')
+    const pixlScript = await getScript('./pixlAgent.js')
+    connection = c
+    let buffer = ''
+    connection.on('data', data => {
+      buffer += data;
+      let i = buffer.indexOf('\n')
+      while (i >= 0) {
+        onLine(buffer.substr(0, i))
+        buffer = buffer.substr(i + 1)
+        i = buffer.indexOf('\n')
+      }
+    })
+    connection.write('reset();\n', () => {
+      // wait a bit to "ensure" reset is done
+      setTimeout(() => {
+        connection.write(
+          `${edgeJSsonScript}\n${pixlScript}`,
+          () => console.log('Ready...'))
+      }, 1500)
+    })
+    setTimeout(() => {
+      setInterval(() => {
+        connection.write(`properties = ${JSON.stringify(properties)};\n`)
+      }, 15000)
+    }, 20000)
   })
 }
 

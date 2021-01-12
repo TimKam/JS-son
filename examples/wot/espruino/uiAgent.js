@@ -1,5 +1,5 @@
 /* eslint-disable-next-line no-use-before-define */
-var Plan = Plan; var Agent = Agent;
+var Plan = Plan; var Agent = Agent; var properties;
 
 const plans = [
   Plan(function (beliefs) { // show purge queue option as long as there is something to purge and temperature is high
@@ -31,16 +31,13 @@ const plans = [
       if (beliefs.temperature > 60 && speed < 1) {
         analysis.text =
         `The robot is overheated (${beliefs.temperature}°C), and has reacted by decreasing its speed (speed: ${speed}).`;
-      } else if (beliefs.temperature > 60 && speed < 1) {
-        analysis.text =
-        `The robot is overheated (${beliefs.temperature}°C), but and has decreased its speed (speed: ${speed}).`;
       } else if (beliefs.temperature > 60 && !speed < 1) {
         analysis.text =
         `The robot is overheated (${beliefs.temperature}°C), but is not decreasing its speed (speed: ${speed}).`;
         analysis.urgency = 'very_urgent';
       } else if (beliefs.temperature < 60 || speed < 1) {
         analysis.text =
-        `The robot is not overheated (${beliefs.temperature}°C), but runs at slow speed down (speed: ${speed}).`;
+        `The robot is not overheated (${beliefs.temperature}°C), but runs at slow speed (speed: ${speed}).`;
         analysis.urgency = 'medium';
       }
       return { analysis };
@@ -104,6 +101,12 @@ async function getProperties () {
       assemblyHistory: await values[3].value.json(),
       temperature: await values[4].value.json()
     };
+    properties = {
+      isRunning: beliefUpdate.isRunning,
+      speed: beliefUpdate.speed,
+      queueLength: beliefUpdate.queue.length,
+      temperature: beliefUpdate.temperature
+    };
     return beliefUpdate;
   });
 }
@@ -112,7 +115,6 @@ function render (state) {
   const overviewObject = state.find(item => item && item.overview);
   if (overviewObject) {
     const overview = overviewObject.overview;
-    console.log(overview);
     document.getElementById('summary-div').innerHTML = `
     <div class="summary-item"><strong>Temperature: </strong> ${overview.temperature} °C</div>
     <div class="summary-item"><strong>Speed: </strong> ${overview.speed}</div>

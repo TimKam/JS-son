@@ -94,6 +94,26 @@ function setWristRotation (rotationValue, delay = defaultDelay) {
 }
 
 /**
+ * Sets the robot's gripper (opens or closes is to the specified "degree")
+ * @param {number} gripperValue Value in [0,512]
+ * @param {number} delay Delay in milliseconds (to not overwhelm the robot with control instructions)
+ * @returns {Promise} Request result promise
+ */
+function setGripper (gripperValue, delay = defaultDelay) {
+  return delayPut('wrist/gripper', { value: gripperValue }, delay)
+}
+
+/**
+ * Sets the robot's base orientation
+ * @param {number} baseValue Value in [0,???]
+ * @param {number} delay Delay in milliseconds (to not overwhelm the robot with control instructions)
+ * @returns {Promise} Request result promise
+ */
+function setBase (baseValue, delay = defaultDelay) {
+  return delayPut('wrist/base', { value: baseValue }, delay)
+}
+
+/**
  * Resets the robot
  * @param {number} delay Delay in milliseconds (to not overwhelm the robot with control instructions) 
  * @returns {Promise} Request result promise
@@ -120,10 +140,14 @@ function assembleConfigurationA (delay) {
  * @returns {Promise} Request result promise of the final request
  */
 function assembleConfigurationB (delay) {
-  return setWristAngle(550, delay)
-    .then(setElbowAngle(450, delay)
-      .then(setWristRotation(750, delay)
-        .then(reset(delay))))
+  return setGripper(512, delay).then(setWristAngle(550, delay)
+    .then(setBase(500)
+      .then(setWristRotation(390, delay)
+        .then(setElbowAngle(510, delay)
+          .then(setGripper(400, delay)
+            .then(setElbowAngle(400, delay)
+              .then(setBase(100)
+                .then(reset(delay)))))))))
 }
 
 /**
@@ -161,6 +185,8 @@ module.exports = {
   setElbowAngle,
   setWristAngle,
   setWristRotation,
+  setGripper,
+  setBase,
   reset,
   assembleConfigurationA,
   assembleConfigurationB,

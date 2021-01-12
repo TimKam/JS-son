@@ -17,7 +17,9 @@ function Agent (id, beliefs, plans) {
     beliefs = Object.assign({}, this.beliefs, beliefs);
     this.beliefs = beliefs;
     if (this.isActive) {
-      return global.Plans[this.plans].run.apply(this, [beliefs]);
+      return this.plans.map(function (plan) {
+        return global.Plans[plan].run.apply(this, [beliefs]);
+      }).filter(function (result) { return result !== null; });
     }
   };
   this.stop = () => (this.isActive = false);

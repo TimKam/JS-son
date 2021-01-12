@@ -29,7 +29,7 @@ WoT.produce({
   thing.writeProperty('temperature', 40)
   thing.setActionHandler('setTemperature', (_, options) => {
     try {
-      thing.writeProperty('setSpeed', options['uriVariables']['temperature'])
+      thing.writeProperty('temperature', options['uriVariables']['temperature'])
     } catch (error) {
       console.error(error)
     }

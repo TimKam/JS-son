@@ -1,7 +1,7 @@
 // import dependencies
 const { Plan } = require('js-son-agent')
 const { thingToAgent, updateThingProperties } = require('js-son-wot')
-const { start, assemble, setWristRotation } = require('robot-interface')
+const { start, assemble } = require('robot-interface')
 
 // configure robot API
 const { robotUrl, user, gatewayUrl } = require('config')
@@ -18,6 +18,12 @@ WoT.produce({
     queue: {
       type: 'array',
       description: 'Current queue of assembly orders that the robot needs to work through',
+      observable: true,
+      readOnly: true
+    },
+    isAgent: {
+      type: 'boolean',
+      description: 'Marks the "thing" as an agent',
       observable: true,
       readOnly: true
     },
@@ -101,11 +107,11 @@ WoT.produce({
     }
   })
 
-  // implement assembly line robot agent
+  // implement assembly robot agent
   thing.writeProperty('isRunning', true)
   thing.writeProperty('speed', 1)
   thing.writeProperty('queue', [])
-  thing.writeProperty('assemblyHistory', [])
+  thing.writeProperty('assemblyHistory', [1, 2, 2,3,4,5,6])
 
   const plans = [
     Plan(
@@ -116,9 +122,7 @@ WoT.produce({
           this.beliefs.thing,
           this.beliefs,
           [
-            'isRunning',
             'speed',
-            'queue',
             'assemblyHistory'
           ]
         )
@@ -182,10 +186,11 @@ WoT.produce({
       function () {
         const item = this.beliefs.queue.shift()
         const configuration = item.configuration
-        assemble(configuration, 3000 / this.beliefs.speed).then(
+        assemble(configuration, 5000 / this.beliefs.speed).then(
           function () {
             this.beliefs.isIdle = true
             this.beliefs.assemblyHistory.push(item)
+            this.beliefs.thing.writeProperty('queue', this.beliefs.queue)
           }.bind(this)
         )
       }

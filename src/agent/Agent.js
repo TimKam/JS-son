@@ -11,6 +11,11 @@ const Intentions = require('./Intentions')
                                           turns all desires into intentions
  * @param {boolean} selfUpdatesPossible If true, agents can update their own belief, plans et cetera
                                         via a body of their plans. Defaults to ``true``.
+ * @param {function} reviseBeliefs belief revision function that takes the agent's currently held
+                                   beliefs as well as the "new" beliefs obtained from the
+                                   environment and revises the agent's beliefs based on this.
+                                   Defaults to: ``(oldBeliefs, newBeliefs) =>``
+                                   ``({ ...oldBeliefs, ...newBeliefs })``
  * @returns {object} JS-son agent object
  */
 
@@ -20,7 +25,8 @@ function Agent (
   desires,
   plans,
   determinePreferences = (beliefs, desires) => desireKey => desires[desireKey](beliefs),
-  selfUpdatesPossible = true
+  selfUpdatesPossible = true,
+  reviseBeliefs = (oldBeliefs, newBeliefs) => ({ ...oldBeliefs, ...newBeliefs })
 ) {
   this.id = id
   this.beliefs = beliefs
@@ -28,12 +34,10 @@ function Agent (
   this.plans = plans
   this.preferenceFunction = determinePreferences
   this.selfUpdatesPossible = selfUpdatesPossible
+  this.reviseBeliefs = reviseBeliefs
   this.isActive = true
   this.next = function (beliefs) {
-    this.beliefs = {
-      ...this.beliefs,
-      ...beliefs
-    }
+    this.beliefs = this.reviseBeliefs(this.beliefs, beliefs)
     if (this.isActive) {
       if (Object.keys(desires).length === 0) {
         this.intentions = this.beliefs

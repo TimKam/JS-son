@@ -72,4 +72,11 @@ describe('Agent / next()', () => {
     const newAgent = new Agent('myAgent', beliefs, desires, newPlans, preferenceFunctionGen, false)
     expect(() => newAgent.next()).toThrow(new TypeError("Cannot set property 'test' of undefined"))
   })
+
+  it('should allow for a custom belief revision function that rejects belief updates from the environment', () => {
+    const reviseBeliefs = (oldBeliefs, newBeliefs) => !newBeliefs.dogNice ? oldBeliefs : newBeliefs
+    const newAgent = new Agent('myAgent', beliefs, desires, plans, undefined, false, reviseBeliefs)
+    newAgent.next({ ...Belief('dogNice', false) })
+    expect(newAgent.beliefs.dogNice).toBe(true)
+  })
 })

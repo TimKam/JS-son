@@ -141,6 +141,16 @@ Because we are not making use of  *desires* in this simple belief-plan scenario,
 const porter = new Agent('porter', beliefs, {}, plansPorter)
 ```
 
+Note that alternatively, we can use a single configuration object to instantiate the agent:
+
+```JavaScript
+const porter = new Agent({
+  id: 'porter',
+  beliefs,
+  plans: plansPorter
+})
+```
+
 Next, we create the paranoid agent with the following plans:
 
 1. If it does not belief the door is locked (head), it requests the door to be locked (body).

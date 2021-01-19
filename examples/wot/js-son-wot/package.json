@@ -16,6 +16,6 @@
   "author": "Timotheus Kampik",
   "license": "MIT",
   "dependencies": {
-    "js-son-agent": "0.0.10"
+    "js-son-agent": "^0.0.12"
   }
 }

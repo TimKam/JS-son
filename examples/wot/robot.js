@@ -111,75 +111,77 @@ WoT.produce({
   thing.writeProperty('isRunning', true)
   thing.writeProperty('speed', 1)
   thing.writeProperty('queue', [])
-  thing.writeProperty('assemblyHistory', [1, 2, 2,3,4,5,6])
+  thing.writeProperty('assemblyHistory', [])
 
-  const plans = [
-    Plan(
-      () => true,
-      // updated thing properties and manage beliefs
-      function () {
-        updateThingProperties(
-          this.beliefs.thing,
-          this.beliefs,
-          [
-            'speed',
-            'assemblyHistory'
-          ]
-        )
-        // Start robot if necessary
-        if (!this.beliefs.hasStarted) {
-          start(robotUrl, user).then(() => {
-            this.beliefs.isIdle = true
-            this.beliefs.hasStarted = true
-          })
-        }
-        // Get thermometer measurements and update beliefs accordingly
-        try {
-          // eslint-disable-next-line
-          WoTHelpers.fetch(`${gatewayUrl}/thermometer`).then(async (td) => {
-            // eslint-disable-next-line
-            const thermometer = await WoT.consume(td)
-            const temperature = await thermometer.readProperty('temperature')
-            this.beliefs.temperature = temperature
-          })
-        } catch (error) {
-          console.log('Thermometer measurements not available')
-        }
-        // Get assembly trigger updates and update beliefs accordingly
-        try {
-          // eslint-disable-next-line
-          WoTHelpers.fetch(`${gatewayUrl}/action_sensor_a`).then(async (td) => {
-            // eslint-disable-next-line
-            const sensorA = await WoT.consume(td)
-            const sensorAHistory = await sensorA.readProperty('history')
-            const newItems = sensorAHistory.filter(itemX =>
-              !this.beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
-            this.beliefs.thing.readProperty('queue').then(queue => {
-              const updatedQueue = queue.concat(newItems)
-              this.beliefs.queue = updatedQueue
-            })
-          })
-        } catch (error) {
-          console.log('action_sensor_a not available')
-        }
-        try {
+  const reviseBeliefs = (oldBeliefs, newBeliefs) => {
+    const beliefs = {
+      ...oldBeliefs,
+      ...newBeliefs
+    }
+    // updated thing properties and manage beliefs
+    updateThingProperties(
+      beliefs.thing,
+      beliefs,
+      [
+        'speed',
+        'assemblyHistory'
+      ]
+    )
+    // Start robot if necessary
+    if (!beliefs.hasStarted) {
+      start(robotUrl, user).then(() => {
+        beliefs.isIdle = true
+        beliefs.hasStarted = true
+      })
+    }
+    // Get thermometer measurements and update beliefs accordingly
+    try {
+      // eslint-disable-next-line
+      WoTHelpers.fetch(`${gatewayUrl}/thermometer`).then(async (td) => {
         // eslint-disable-next-line
+        const thermometer = await WoT.consume(td)
+        const temperature = await thermometer.readProperty('temperature')
+        beliefs.temperature = temperature
+      })
+    } catch (error) {
+      console.log('Thermometer measurements not available')
+    }
+    // Get assembly trigger updates and update beliefs accordingly
+    try {
+      // eslint-disable-next-line
+      WoTHelpers.fetch(`${gatewayUrl}/action_sensor_a`).then(async (td) => {
+        // eslint-disable-next-line
+        const sensorA = await WoT.consume(td)
+        const sensorAHistory = await sensorA.readProperty('history')
+        const newItems = sensorAHistory.filter(itemX =>
+          !beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
+        beliefs.thing.readProperty('queue').then(queue => {
+          const updatedQueue = queue.concat(newItems)
+          beliefs.queue = updatedQueue
+        })
+      })
+    } catch (error) {
+      console.log('action_sensor_a not available')
+    }
+    try {
+      // eslint-disable-next-line
         WoTHelpers.fetch(`${gatewayUrl}/action_sensor_b`).then(async (td) => {
-          // eslint-disable-next-line
-            const sensorB = await WoT.consume(td)
-            const sensorBHistory = await sensorB.readProperty('history')
-            const newItems = sensorBHistory.filter(itemX =>
-              !this.beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
-            this.beliefs.thing.readProperty('queue').then(queue => {
-              const updatedQueue = queue.concat(newItems)
-              this.beliefs.queue = updatedQueue
-            })
-          })
-        } catch (error) {
-          console.log('action_sensor_b not available')
-        }
-      }
-    ),
+        // eslint-disable-next-line
+        const sensorB = await WoT.consume(td)
+        const sensorBHistory = await sensorB.readProperty('history')
+        const newItems = sensorBHistory.filter(itemX =>
+          !beliefs.assemblyHistory.some(itemY => itemX.id === itemY.id))
+        beliefs.thing.readProperty('queue').then(queue => {
+          const updatedQueue = queue.concat(newItems)
+          beliefs.queue = updatedQueue
+        })
+      })
+    } catch (error) {
+      console.log('action_sensor_b not available')
+    }
+    return beliefs
+  }
+  const plans = [
     Plan(
       beliefs => beliefs.isRunning && beliefs.queue.length > 0 && beliefs.isIdle,
       // assemble next item in queue and remove item from queue
@@ -216,7 +218,7 @@ WoT.produce({
     )
   ]
 
-  const robot = thingToAgent(thing, plans)
+  const robot = thingToAgent(thing, plans, reviseBeliefs)
   thing.expose().then(() => console.info(`${thing.getThingDescription().title} ready`))
   setInterval(() => {
     robot.next({

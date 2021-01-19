@@ -7,7 +7,7 @@
     "@node-wot/binding-coap": "^0.7.0",
     "@node-wot/cli": "^0.7.1",
     "@node-wot/core": "^0.7.0",
-    "js-son-agent": "^0.0.10",
+    "js-son-agent": "^0.0.12",
     "js-son-wot": "file:js-son-wot",
     "robot-interface": "file:robot-interface",
     "config": "file:config"

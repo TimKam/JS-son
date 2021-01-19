@@ -76,5 +76,6 @@ Then, run ``http-server ./espruino -p=8081``.
 ## Advanced Usage - Espruino Device Integration
 Open ``http://127.0.0.1:8081``.
 From there, you can deploy things and agents to Esprunio [Puck.js](http://www.espruino.com/Puck.js) and [Pixl.js](http://www.espruino.com/Pixl.js) devices, respectively.
+Also, the web interface at ``http://127.0.0.1:8081`` hosts an agent that monitors the leubot robot.
 
 

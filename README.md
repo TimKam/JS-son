@@ -141,6 +141,16 @@ Because we are not making use of  *desires* in this simple belief-plan scenario,
 const porter = new Agent('porter', beliefs, {}, plansPorter)
 ```
 
+Note that alternatively, we can use a single configuration object to instantiate the agent:
+
+```JavaScript
+const porter = new Agent({
+  id: 'porter',
+  beliefs,
+  plans: plansPorter
+})
+```
+
 Next, we create the paranoid agent with the following plans:
 
 1. If it does not belief the door is locked (head), it requests the door to be locked (body).
@@ -482,6 +492,51 @@ Finally, we run 50 iterations of the scenario:
 environment.run(50)
 ```
 
+## Belief Revision
+By default, JS-son agents get their belief update from the environment and revise their existing
+beliefs as follows:
+
+```JavaScript
+beliefs = {
+  ...oldBeliefs,
+  ...newBeliefs
+}
+```
+Here, ``oldBeliefs`` are the agent's existing beliefs, whereas ``newBeliefs`` are the belief updates the agent receives; *i.e.*, the agent always accepts the belief update.
+However, JS-son supports the implementation of a custom belief revision function that allows agents to (partially or fully) reject belief updates received from their environment, to post-process beliefs in any other manner, or to acquire additional beliefs on their own.
+For example, let us implement the following simple agent:
+
+```JavaScript
+let agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [])
+```
+
+Now, let us run the agent so that the environment changes the agent's belief about ``a``.
+
+```JavaScript
+agent.next({ ...Belief('a', false) })
+```
+
+``agent.beliefs.a`` is ``false``.
+
+We can implement a custom belief revision function that guarantees that the belief about ``a`` must not be overwritten:
+
+```JavaScript
+const (oldBeliefs, newBeliefs) => ({
+  ...oldBeliefs,
+  ...newBeliefs,
+  a: true
+})
+let agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [], undefined, false, reviseBeliefs)
+```
+
+To test the change, proceed as follows:
+
+```JavaScript
+agent.next({ ...Belief('a', false) })
+```
+
+``agent.beliefs.a`` is ``true``.
+
 ## Messaging
 JS-son agents can send "private" messages to any other JS-son agent, which the environment will then relay to this agent only.
 Agents can send these messages in the same way they register the execution of an action as the result of a plan.
@@ -547,7 +602,7 @@ Contributions that change this are welcome!
 ## Testing
 The project uses [Jasime](https://jasmine.github.io/2.0/node.html) for testing.
 Run the tests with ``npm test``.
-The tests also run on Travis-CI.
+The tests also run on CircleCI.
 
 ## Documentation
 *JS-son* is documented with [Sphinx](http://www.sphinx-doc.org/en/master/).

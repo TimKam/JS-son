@@ -1,6 +1,6 @@
 {
   "name": "js-son-agent",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "description": "JS-son - a Minimal JavaScript BDI Agent Library",
   "main": "lib/index.js",
   "scripts": {
@@ -41,6 +41,6 @@
     "jasmine": "^3.3.1",
     "jsdoc": "^3.6.3",
     "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1"
+    "webpack-cli": "^3.3.12"
   }
 }

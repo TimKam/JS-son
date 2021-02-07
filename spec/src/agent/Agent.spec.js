@@ -8,6 +8,7 @@ const {
   preferenceFunctionGen,
   plans
 } = require('../../mocks/human')
+const Goal = require('../../../src/agent/Goal')
 
 describe('Agent / next()', () => {
   const agent = new Agent('myAgent', beliefs, desires, plans, preferenceFunctionGen)
@@ -169,7 +170,7 @@ describe('Agent / next(), configuration object-based', () => {
     expect(() => newAgent.next()).toThrow(new TypeError("Cannot set property 'test' of undefined"))
   })
 
-  it('should allow for a custom belief revision function that rejects belief updates from the environment', () => {
+  it('should support a custom belief revision function that rejects belief updates from the environment', () => {
     const reviseBeliefs = (oldBeliefs, newBeliefs) => !newBeliefs.dogNice ? oldBeliefs : newBeliefs
     const newAgent = new Agent({
       id: 'myAgent',
@@ -181,5 +182,29 @@ describe('Agent / next(), configuration object-based', () => {
     })
     newAgent.next({ ...Belief('dogNice', false) })
     expect(newAgent.beliefs.dogNice).toBe(true)
+  })
+
+  it('should support a custom goal revision function, e.g. to determine which goals are active, which inactive', () => {
+    const beliefs = {
+      ...Belief('dogNice', false)
+    }
+    const goals = {
+      praiseDog: Goal('praiseDog', false, { dogName: 'Hasso' })
+    }
+    const reviseGoals = (beliefs, goals) => {
+      if (beliefs.dogNice) {
+        goals.praiseDog.isActive = true
+      }
+      return goals
+    }
+    const plans = [ Plan(goals.praiseDog, (belief, goalValue) => ({ action: `Good dog, ${goalValue.dogName}!` })) ]
+    const newAgent = new Agent({
+      id: 'MyAgent',
+      beliefs,
+      goals,
+      plans,
+      reviseGoals
+    })
+    expect(newAgent.next({ ...Belief('dogNice', true) })[0].action).toEqual('Good dog, Hasso!')
   })
 })

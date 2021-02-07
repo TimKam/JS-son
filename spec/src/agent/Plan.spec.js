@@ -41,8 +41,8 @@ describe('Plan / run()', () => {
 
   it('should support goal-based plans', () => {
     const goal = Goal('praiseDog', true, { dogName: 'Hasso' })
-    const praiseDog = Plan(goal, (beliefs, goal) => ({
-      actions: [`Good dog, ${goal.value.dogName}!`]
+    const praiseDog = Plan(goal, (beliefs, goalValue) => ({
+      actions: [`Good dog, ${goalValue.dogName}!`]
     }))
     const expectedPlanResult = {
       actions: ['Good dog, Hasso!']
@@ -53,7 +53,7 @@ describe('Plan / run()', () => {
   it('should not trigger goal-based plans for active goals', () => {
     const goal = Goal('praiseDog', false, { dogName: 'Hasso' })
     const praiseDog = Plan(goal, (beliefs, goal) => ({
-      actions: [`Good dog, ${goal.value.dogName}!`]
+      actions: [`Good dog, ${goal.dogName}!`]
     }))
     expect(praiseDog.run(beliefs, goal)).toBe(null)
   })

@@ -273,7 +273,7 @@ const goals = {
 }
 ```
 
-The goal has the ID ``praiseDog``, is ``false`` (when starting) and has the property ``dogname``, which is ``Hasso``.
+The goal has the ID ``praiseDog``, is ``false`` (when starting) and has a ``value`` object with the property ``dogname``, which is ``Hasso``.
 The agent starts with the belief that Hasso has not been a nice dog:
 
 ```JavaScript
@@ -293,12 +293,12 @@ const reviseGoals = (beliefs, goals) => {
 }
 ```
 
-Our agent has only one plan, which is attached to the ``praiseDog`` goal, *i.e.*, if the goal is active, the plan is executed (the agent praises the dog):
+Our agent has only one plan, which is attached to the ``praiseDog`` goal, *i.e.*, if the goal is active, the plan's *body* function is executed (the agent praises the dog):
 
 ```JavaScript
-const plans = [ Plan(goals.praiseDog, () => ({ action: 'Good dog!' })) ]
+const plans = [ Plan(goals.praiseDog, (beliefs, goalValue) => ({ action: `Good dog, ${goalValue.dogName}!` })) ]
 ```
-
+Note that the value of a plan's goal can be accessed in the body of the plan.
 Based on the goals, beliefs, goal revision function, and plans, we instantiate the agent:
 
 ```JavaScript

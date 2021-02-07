@@ -11,7 +11,7 @@ const Plan = (head, body) => ({
   // run: executed body if head is true; else: return null
   run: function (beliefs) {
     return typeof head === 'function' ? head(beliefs) === true ? body.apply(this, [beliefs]) : null
-      : head.isActive ? body.apply(this, [beliefs, head]) : null
+      : head.isActive ? body.apply(this, [beliefs, head.value]) : null
   }
 })
 

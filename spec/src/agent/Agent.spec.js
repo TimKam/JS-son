@@ -197,7 +197,7 @@ describe('Agent / next(), configuration object-based', () => {
       }
       return goals
     }
-    const plans = [ Plan(goals.praiseDog, () => ({ action: 'Good dog!' })) ]
+    const plans = [ Plan(goals.praiseDog, (belief, goalValue) => ({ action: `Good dog, ${goalValue.dogName}!` })) ]
     const newAgent = new Agent({
       id: 'MyAgent',
       beliefs,
@@ -205,6 +205,6 @@ describe('Agent / next(), configuration object-based', () => {
       plans,
       reviseGoals
     })
-    expect(newAgent.next({ ...Belief('dogNice', true) })[0].action).toEqual('Good dog!')
+    expect(newAgent.next({ ...Belief('dogNice', true) })[0].action).toEqual('Good dog, Hasso!')
   })
 })

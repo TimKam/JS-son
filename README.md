@@ -263,6 +263,61 @@ Finally, we run 20 iterations of the scenario:
 environment.run(20)
 ```
 
+### Goal-based Approach
+JS-son supports an alternative goal-based reasoning loop. Here, we show a minimal working example of an agent that employs this approach.
+Our agent has merely one goal:
+
+```JavaScript
+const goals = {
+  praiseDog: Goal('praiseDog', false, { dogName: 'Hasso' })
+}
+```
+
+The goal has the ID ``praiseDog``, is ``false`` (when starting) and has the property ``dogname``, which is ``Hasso``.
+The agent starts with the belief that Hasso has not been a nice dog:
+
+```JavaScript
+const beliefs = {
+  ...Belief('dogNice', false)
+}
+```
+
+The agent's *goal revision function*  takes the agent's current beliefs and goals and returns a revised goal object (that can feature new goals, revised goals, and/or have previously existing goals removed):
+
+```JavaScript
+const reviseGoals = (beliefs, goals) => {
+  if (beliefs.dogNice) {
+    goals.praiseDog.isActive = true
+  }
+  return goals
+}
+```
+
+Our agent has only one plan, which is attached to the ``praiseDog`` goal, *i.e.*, if the goal is active, the plan is executed (the agent praises the dog):
+
+```JavaScript
+const plans = [ Plan(goals.praiseDog, () => ({ action: 'Good dog!' })) ]
+```
+
+Based on the goals, beliefs, goal revision function, and plans, we instantiate the agent:
+
+```JavaScript
+const newAgent = new Agent({
+  id: 'MyAgent',
+  beliefs,
+  goals,
+  plans,
+  reviseGoals
+})
+```
+
+Finally, we run the agent's reasoning loop for one iteration, and provide an updated belief update the dog's niceness:
+
+```JavaScript
+newAgent.next({ ...Belief('dogNice', true) }
+```
+Note that this activates the ``praiseDog`` goal and hence triggers the execution of the agent's only plan.
+
 ### Belief-Desire-Intention-Plan Approach
 In this tutorial, we implement a simple information spread simulation, using JS-son's full belief-desire-intention-plan approach.
 We simulate the spread of a single boolean belief among 100 agents.

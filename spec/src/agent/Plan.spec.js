@@ -1,5 +1,6 @@
 const Intentions = require('../../../src/agent/Intentions')
 const Plan = require('../../../src/agent/Plan')
+const Goal = require('../../../src/agent/Goal')
 
 const {
   beliefs,
@@ -36,5 +37,24 @@ describe('Plan / run()', () => {
     }
     beliefs.dogName = 'Hasso'
     expect(praiseDog.run(beliefs)).toEqual(expectedPlanResult)
+  })
+
+  it('should support goal-based plans', () => {
+    const goal = Goal('praiseDog', true, { dogName: 'Hasso' })
+    const praiseDog = Plan(goal, (beliefs, goal) => ({
+      actions: [`Good dog, ${goal.value.dogName}!`]
+    }))
+    const expectedPlanResult = {
+      actions: ['Good dog, Hasso!']
+    }
+    expect(praiseDog.run(beliefs, goal)).toEqual(expectedPlanResult)
+  })
+
+  it('should not trigger goal-based plans for active goals', () => {
+    const goal = Goal('praiseDog', false, { dogName: 'Hasso' })
+    const praiseDog = Plan(goal, (beliefs, goal) => ({
+      actions: [`Good dog, ${goal.value.dogName}!`]
+    }))
+    expect(praiseDog.run(beliefs, goal)).toBe(null)
   })
 })

@@ -2,6 +2,7 @@ const Intentions = require('./Intentions')
 
 const defaultPreferenceFunction = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
 const defaultBeliefRevisionFunction = (oldBeliefs, newBeliefs) => ({ ...oldBeliefs, ...newBeliefs })
+const defaultGoalRevisionFunction = (beliefs, goals) => goals
 
 /**
  * JS-son agent generation function. Note that an agent can be instantiated using either a
@@ -22,7 +23,9 @@ const defaultBeliefRevisionFunction = (oldBeliefs, newBeliefs) => ({ ...oldBelie
                                           the environment and revises the agent's beliefs based on
                                           this. Defaults to: ``(oldBeliefs, newBeliefs) =>``
                                           ``({ ...oldBeliefs, ...newBeliefs })``
- *
+ * @param {function} config.reviseGoals goal revision function that takes the agent's beliefs
+                                          and goals and then updates the goals.
+                                          Defaults to: ``(beliefs, goals) => goals``
  * OR
  * @param {string} id unique identifier for the agent
  * @param {object} beliefs initial beliefs of the agent
@@ -38,6 +41,9 @@ const defaultBeliefRevisionFunction = (oldBeliefs, newBeliefs) => ({ ...oldBelie
                                    environment and revises the agent's beliefs based on this.
                                    Defaults to: ``(oldBeliefs, newBeliefs) =>``
                                    ``({ ...oldBeliefs, ...newBeliefs })``
+* @param {function} reviseGoals goal revision function that takes the agent's beliefs
+                                and goals and then updates the goals.
+                                Defaults to: ``(beliefs, goals) => goals``
  * @returns {object} JS-son agent object
  */
 
@@ -48,7 +54,9 @@ function Agent (
   plans,
   determinePreferences = defaultPreferenceFunction,
   selfUpdatesPossible = true,
-  reviseBeliefs = defaultBeliefRevisionFunction
+  reviseBeliefs = defaultBeliefRevisionFunction,
+  goals = undefined,
+  reviseGoals = defaultGoalRevisionFunction
 ) {
   if (typeof idConfig === 'object') {
     const config = idConfig
@@ -59,6 +67,8 @@ function Agent (
     this.preferenceFunction = config.determinePreferences || defaultPreferenceFunction
     this.selfUpdatesPossible = !(config.selfUpdatesPossible === false)
     this.reviseBeliefs = config.reviseBeliefs || defaultBeliefRevisionFunction
+    this.reviseGoals = config.reviseGoals || defaultGoalRevisionFunction
+    this.goals = config.goals
   } else {
     this.id = idConfig
     this.beliefs = beliefs
@@ -67,10 +77,13 @@ function Agent (
     this.preferenceFunction = determinePreferences
     this.selfUpdatesPossible = selfUpdatesPossible
     this.reviseBeliefs = reviseBeliefs
+    this.reviseGoals = reviseGoals
+    this.goals = goals
   }
   this.isActive = true
   this.next = function (beliefs) {
     this.beliefs = this.reviseBeliefs(this.beliefs, beliefs)
+    this.goals = this.reviseGoals(beliefs, this.goals)
     if (this.isActive) {
       if (Object.keys(this.desires).length === 0) {
         this.intentions = this.beliefs

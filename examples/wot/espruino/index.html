@@ -1,0 +1,102 @@
+
+<html>
+    <head>
+      <style>
+        body { margin:0;  font-family: Verdana, Geneva, Tahoma, sans-serif;}
+        h1 {
+            display: block;
+            margin: auto;
+            margin-bottom: auto;
+            padding: 10px;
+            background-color: #2A4765;
+            color: #FFF;
+            width: 100%;
+            margin-bottom: 25px;
+            justify-content: center;
+            display: flex;
+        }
+        button {
+            height: 50px;
+            font-size: 20px;
+            background-color: #F0EEE3;
+            border: none;
+            margin: 10px;
+            display: inline;
+            float: none;
+        }
+        button:hover {
+            cursor: pointer;
+        }
+        button#deploy, div.console {
+          display:block;;
+          margin: auto;
+          width: 20%;
+          padding: 10px;
+        }
+        div.sub-div {
+          display:block;;
+          margin: auto;
+          padding: 10px;
+          width: 100%;
+          margin-bottom: 25px;
+          justify-content: center;
+          display: flex;
+        }
+        #deployment {
+            width: 100%;
+            margin: auto;
+        }
+        .summary-item, .analysis, #action-div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .analysis {
+            margin-top: 25px;
+            padding: 25px;
+        }
+        .urgent {
+            background-color: #EABAB9;
+        }
+        .medium {
+            background-color: #D7B17C;
+        }
+        .very_urgent {
+            background-color: red;
+        }
+        .hidden {
+            visibility: collapse;
+        }
+      </style>    
+    </head>
+    <body>
+      <h1>Espruino - Gateway and Deployment Interface</h1>
+      <div id="deployment">
+        <button id="deploy-pixl">Deploy to Pixl.js (Guide Agent)</button>
+        <button id="deploy-puck-a">Deploy to Puck.js, Config A (Assembly Trigger)</button>
+        <button id="deploy-puck-b">Deploy to Puck.js, Config B (Assembly Trigger)</button>
+      </div>
+      <div class="sub-div" ><strong>Open console to view log.</strong></div>
+      <h1>Monitoring Guide</h1>
+      <div id="monitor">
+        <div class="sub-div" ><strong>Leubot-1</strong></div>
+        <div id="summary-div">
+
+        </div>
+        <div id="analysis-div">
+
+        </div>
+        <div id="action-div">
+            <div id="recommendation-heading" class="sub-div hidden"><strong>Action Recommendation(s):</strong></div>
+
+            <button class="hidden" onclick="stopRobot()" id="stop">Stop robot</button>
+            <button class="hidden" onclick="purgeQueue()" id="purge">Purge queue</button>
+        </div>
+      </div>
+     <script src="https://www.puck-js.com/puck.js"></script>
+     <script src="./client.js"></script>
+     <script src="./config.js"></script>
+     <script src="./edge-json/EdgeJSson.js"></script>
+     <script src="./uiAgent.js"></script>
+    </body>
+   </html>

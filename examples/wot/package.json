@@ -1,0 +1,21 @@
+{
+  "name": "js-son-wot-example",
+  "version": "0.0.1",
+  "description": "Web of Things example: integrating JS-son with the WoT Scripting API",
+  "main": "index.js",
+  "dependencies": {
+    "@node-wot/binding-coap": "^0.7.0",
+    "@node-wot/cli": "^0.7.1",
+    "@node-wot/core": "^0.7.0",
+    "js-son-agent": "^0.0.12",
+    "js-son-wot": "file:js-son-wot",
+    "robot-interface": "file:robot-interface",
+    "config": "file:config"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./node_modules/@node-wot/cli/dist/cli.js"
+  },
+  "author": "Timotheus Kampik",
+  "license": "BSD-2-Clause"
+}

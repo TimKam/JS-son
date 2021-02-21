@@ -79,6 +79,7 @@ doc/_build/
 examples/node/package-lock.json
 examples/node/node_modules/
 examples/distributed/node_modules/
+examples/wot/node_modules/
 examples/web/www
 examples/arena/www
 

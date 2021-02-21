@@ -1,0 +1,21 @@
+{
+  "name": "js-son-wot",
+  "version": "0.0.1",
+  "description": "JS-son interface to the W3C WoT Scripting API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web",
+    "of",
+    "things",
+    "IoT",
+    "agents"
+  ],
+  "author": "Timotheus Kampik",
+  "license": "MIT",
+  "dependencies": {
+    "js-son-agent": "^0.0.12"
+  }
+}

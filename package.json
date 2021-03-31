@@ -1,6 +1,6 @@
 {
   "name": "js-son-agent",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "JS-son - a Minimal JavaScript BDI Agent Library",
   "main": "lib/index.js",
   "scripts": {

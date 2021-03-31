@@ -83,7 +83,7 @@ function Agent (
   this.isActive = true
   this.next = function (beliefs) {
     this.beliefs = this.reviseBeliefs(this.beliefs, beliefs)
-    this.goals = this.reviseGoals(beliefs, this.goals)
+    this.goals = this.reviseGoals(this.beliefs, this.goals)
     if (this.isActive) {
       if (Object.keys(this.desires).length === 0) {
         this.intentions = this.beliefs

@@ -207,4 +207,32 @@ describe('Agent / next(), configuration object-based', () => {
     })
     expect(newAgent.next({ ...Belief('dogNice', true) })[0].action).toEqual('Good dog, Hasso!')
   })
+
+  it('should support integrated goal and belief revision', () => {
+    const beliefs = {
+      ...Belief('dogNice', false)
+    }
+    const goals = {
+      praiseDog: Goal('praiseDog', false, { dogName: 'Hasso' })
+    }
+    const reviseBeliefs = () => {
+      return { dogNice: true }
+    }
+    const reviseGoals = (beliefs, goals) => {
+      if (beliefs.dogNice) {
+        goals.praiseDog.isActive = true
+      }
+      return goals
+    }
+    const plans = [ Plan(goals.praiseDog, (belief, goalValue) => ({ action: `Good dog, ${goalValue.dogName}!` })) ]
+    const newAgent = new Agent({
+      id: 'MyAgent',
+      beliefs,
+      goals,
+      plans,
+      reviseBeliefs,
+      reviseGoals
+    })
+    expect(newAgent.next({ ...Belief('dogNice', false) })[0].action).toEqual('Good dog, Hasso!')
+  })
 })

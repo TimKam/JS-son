@@ -14,20 +14,20 @@ neighbors.
   determine how many neighbors of an agent are active
 */
 const determineNeighborActivity = (index, activityArray) => {
-  const leftNeighbors = index % 10 === 0
+  const leftNeighbors = index % 15 === 0
     ? []
-    : [activityArray[index - 11], activityArray[index - 1], activityArray[index + 9]]
+    : [activityArray[index - 16], activityArray[index - 1], activityArray[index + 14]]
 
-  const rightNeighbors = index % 10 === 9
+  const rightNeighbors = index % 15 === 14
     ? []
-    : [activityArray[index - 9], activityArray[index + 1], activityArray[index + 11]]
+    : [activityArray[index - 14], activityArray[index + 1], activityArray[index + 16]]
   return [
-    activityArray[index - 10],
-    activityArray[index + 10]
+    activityArray[index - 15],
+    activityArray[index + 15]
   ].concat(leftNeighbors, rightNeighbors).filter(element => element).length
 }
 
-const plans = [
+const plans = [ 
   Plan(
     beliefs => {
       const neighborActivity = determineNeighborActivity(beliefs.index, beliefs.activityArray)
@@ -49,7 +49,23 @@ const plans = [
 ]
 
 // generates (pseudo-)random initial activity state (active or inactive)
-const generateInitialActivity = () => new Array(100).fill(0).map((_, index) => Math.random() < 0.5)
+const generateInitialActivity = () => [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,  
+  0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,  
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,
+  0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+]
 
 // generates 100 agents with provided initial activity state
 const generateAgents = initialActivity => initialActivity.map((value, index) => {
@@ -72,7 +88,7 @@ const updateState = (actions, agentId, currentState) => {
   }
   const agentActive = actions.some(action => action.nextRound === 'active')
   stateUpdate.nextActivity.push(agentActive)
-  if (agentId === '99') {
+  if (agentId === '224') {
     return {
       previousActivity: stateUpdate.nextActivity,
       nextActivity: []
@@ -92,13 +108,13 @@ const render = state => {
     const grid = agentActivity.map((value, index) => {
       const agentClass = value ? 'agent active-agent' : 'agent inactive-agent'
       if (index === 0) {
-        return `<div class="row no-gap"><div class="col-10 ${agentClass}">_</div>`
-      } else if (index % 10 === 0) {
-        return `</div><div class="row no-gap"><div class="col-10 ${agentClass}">_</div>`
-      } else if (index === 99) {
-        return `<div class="col-10 ${agentClass}">_</div></div>`
+        return `<div class="row no-gap"><div class="col-5 ${agentClass}">_</div>`
+      } else if (index % 15 === 0) {
+        return `</div><div class="row no-gap"><div class="col-5 ${agentClass}">_</div>`
+      } else if (index === 224) {
+        return `<div class="col-5 ${agentClass}">_</div></div>`
       } else {
-        return `<div class="col-10 ${agentClass}">_</div>`
+        return `<div class="col-5 ${agentClass}">_</div>`
       }
     }).join('')
     $$('#game-of-life-grid').html(grid)

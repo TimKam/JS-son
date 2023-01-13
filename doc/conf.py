@@ -23,7 +23,7 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'JS-son'
-copyright = '2019, Timotheus Kampik'
+copyright = '2023, Timotheus Kampik'
 author = 'Timotheus Kampik'
 
 # The short X.Y version
@@ -112,6 +112,8 @@ html_sidebars = {
         'relations.html'
     ]
 }
+
+language = 'en'
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

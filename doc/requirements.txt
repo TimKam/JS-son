@@ -1,0 +1,2 @@
+sphinx_js>=3.2.1
+recommonmark>=0.7.1

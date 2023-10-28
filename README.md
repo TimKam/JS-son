@@ -173,8 +173,7 @@ const plansParanoid = [
 const paranoid = new Agent('paranoid', beliefs, {}, plansParanoid)
 ```
 
-The last agent we create is the *paranoid* one.
-It has these plans:
+The last agent we create is the *claustrophobe*. It has these plans:
 
 1. If it beliefs the door the door is locked (head), it requests the door to be unlocked (body).
 

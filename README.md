@@ -562,7 +562,7 @@ However, JS-son supports the implementation of a custom belief revision function
 For example, let us implement the following simple agent:
 
 ```JavaScript
-let agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [])
+const agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [])
 ```
 
 Now, let us run the agent so that the environment changes the agent's belief about ``a``.
@@ -581,7 +581,7 @@ const (oldBeliefs, newBeliefs) => ({
   ...newBeliefs,
   a: true
 })
-let agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [], undefined, false, reviseBeliefs)
+const agent = new Agent('myAgent', { ...Belief('a', true) }, {}, [], undefined, false, reviseBeliefs)
 ```
 
 To test the change, proceed as follows:
@@ -591,6 +591,48 @@ agent.next({ ...Belief('a', false) })
 ```
 
 ``agent.beliefs.a`` is ``true``.
+
+JS-son provides an out-of-the-box belief revision function that handles priority rules.
+We can import this function as follows:
+
+```JavaScript
+const revisePriority = JSson.revisionFunctions.revisePriority
+```
+
+Let us now specify an initial belief base and an update thereof.
+In both, each belief has a numerical priority value:
+
+```JavaScript
+const beliefBase = {
+  isRaining: Belief('isRaining', true, 0),
+  temperature: Belief('temperature', 10, 0),
+  propertyValue: Belief('propertyValue', 500000, 1)
+}
+
+const update = {
+  isRaining: Belief('isRaining', false, 0),
+  temperature: Belief('temperature', 15, 1),
+  propertyValue: Belief('propertyValue', 250000, 0)
+}
+
+const agent = new Agent('myAgent', beliefBase, {}, [], undefined, false, revisePriority)
+```
+
+After applying the belief update, our agent's belief base is as follows:
+
+```JavaScript
+{
+  isRaining: Belief('isRaining', false, 0),
+  temperature: Belief('temperature', 15, 1),
+  propertyValue: Belief('propertyValue', 500000, 1)
+}
+```
+
+Note that in detail, the priorities are interpreted as follows:
+
+* If a belief exists in the update, but not in the agent's belief base, this belief is added.
+* If the belief's priority is 0 in the belief base and a belief with the same key exists in the update, the agent's belief is overridden; this behavior is desired for beliefs that are generally defeasible.
+* If a belief's priority in the update is higher than the same belief's priority in the agent's belief base, the agent's belief is overridden.
 
 ## Messaging
 JS-son agents can send "private" messages to any other JS-son agent, which the environment will then relay to this agent only.

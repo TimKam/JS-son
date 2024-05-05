@@ -9,6 +9,10 @@ describe('belief()', () => {
     expect(Belief('test', 'test')).toEqual({ test: 'test' })
   })
 
+  it('should create a new belief with the specified key, value (explicitly managed), and priority', () => {
+    expect(Belief('test', 'test', 1)).toEqual({ test: 'test', value: 'test', priority: 1 })
+  })
+
   it('should not throw a warning if belief is of a JSON data type', () => {
     console.warn.calls.reset()
     // eslint-disable-next-line no-unused-vars

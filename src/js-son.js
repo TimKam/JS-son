@@ -8,7 +8,8 @@ const JSson = {
   RemoteAgent: require('./agent/RemoteAgent'),
   Environment: require('./environment/Environment'),
   GridWorld: require('./environment/GridWorld'),
-  FieldType: require('./environment/FieldType')
+  FieldType: require('./environment/FieldType'),
+  revisionFunctions: require('./agent/beliefRevision/revisionFunctions')
 }
 
 module.exports = JSson

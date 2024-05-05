@@ -1,7 +1,7 @@
 const Intentions = require('./Intentions')
+const defaultBeliefRevisionFunction = require('./beliefRevision/revisionFunctions').reviseSimpleNonmonotonic
 
 const defaultPreferenceFunction = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
-const defaultBeliefRevisionFunction = (oldBeliefs, newBeliefs) => ({ ...oldBeliefs, ...newBeliefs })
 const defaultGoalRevisionFunction = (beliefs, goals) => goals
 
 /**

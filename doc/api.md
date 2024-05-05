@@ -18,6 +18,18 @@
 
 ```
 
+## Built-In Belief Revision Functions
+
+```eval_rst
+
+.. js:autofunction:: reviseSimpleNonmonotonic
+
+.. js:autofunction:: reviseMonotonic
+
+.. js:autofunction:: revisePriority
+
+```
+
 ## Environment
 
 ```eval_rst

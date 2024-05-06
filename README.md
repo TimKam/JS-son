@@ -630,9 +630,22 @@ After applying the belief update, our agent's belief base is as follows:
 
 Note that in detail, the priorities are interpreted as follows:
 
-* If a belief exists in the update, but not in the agent's belief base, this belief is added.
-* If the belief's priority is 0 in the belief base and a belief with the same key exists in the update, the agent's belief is overridden; this behavior is desired for beliefs that are generally defeasible.
-* If a belief's priority in the update is higher than the same belief's priority in the agent's belief base, the agent's belief is overridden.
+  * If a belief exists in the update, but not in the agent's belief base, this belief is added.
+  * If the belief's priority is 0 in the belief base and a belief with the same key exists in the update, the agent's belief is overridden; this behavior is desired for beliefs that are generally defeasible.
+  * If a belief's priority in the update is higher than the same belief's priority in the agent's belief base, the agent's belief is overridden.
+
+A potential issue that the belief revision function we use above does not address is that it essentially requires the *inflation* of priorities in case of regular successful revisions of beliefs with a non-zero priority.
+For example, in order to update ``the belief \verb|propertyValue: { value: 500000, priority: 1 }``, a new ``propertyValue`` belief can only defeat the belief if its priority is ``2`` or higher; the subsequent defeater will then require a priority of ``3``, and so on.    
+We can address this issue by defining whether a particular belief (or beliefs in general) should, when defeated, adopt the priority of their defeater.
+
+When using ``JSson.revisionFunctions.revisePriorityStatic`` as our belief revision function, the priority of the initial beliefs are maintained. Alternatively, we can specify whether or not a belief's priority should be updated, on the level of the individual belief:
+
+```JavaScript
+const beliefBase = {
+      isRaining: Belief('isRaining', true, Infinity, true),
+      temperature: Belief('temperature', 10, Infinity, false)
+    }
+```
 
 ## Messaging
 JS-son agents can send "private" messages to any other JS-son agent, which the environment will then relay to this agent only.

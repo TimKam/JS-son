@@ -9,8 +9,8 @@ describe('belief()', () => {
     expect(Belief('test', 'test')).toEqual({ test: 'test' })
   })
 
-  it('should create a new belief with the specified key, value (explicitly managed), and priority', () => {
-    expect(Belief('test', 'test', 1)).toEqual({ test: 'test', value: 'test', priority: 1 })
+  it('should create a new belief with the specified key, value (explicitly managed), priority, and priority update spec', () => {
+    expect(Belief('test', 'test', 1)).toEqual({ test: 'test', value: 'test', priority: 1, updatePriority: false })
   })
 
   it('should not throw a warning if belief is of a JSON data type', () => {

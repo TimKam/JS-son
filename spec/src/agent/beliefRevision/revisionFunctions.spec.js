@@ -3,7 +3,8 @@ const Belief = require('../../../../src/agent/Belief')
 const {
   reviseSimpleNonmonotonic,
   reviseMonotonic,
-  revisePriority } = require('../../../../src/agent/beliefRevision/revisionFunctions')
+  revisePriority,
+  revisePriorityStatic } = require('../../../../src/agent/beliefRevision/revisionFunctions')
 
 const {
   beliefs,
@@ -97,5 +98,39 @@ describe('revisionFunctions', () => {
     newAgent.next(update)
     expect(newAgent.beliefs.isRaining.value).toBe(true)
     expect(newAgent.beliefs.temperature.value).toEqual(10)
+  })
+
+  it('should allow configuring a belief such that its initial priority is kept', () => {
+    const beliefBase = { isRaining: Belief('isRaining', true, 1, false) }
+
+    const update = { isRaining: Belief('isRaining', false, 2) }
+
+    const newAgent = new Agent({
+      id: 'myAgent',
+      beliefs: beliefBase,
+      desires,
+      plans,
+      selfUpdatesPossible: false,
+      reviseBeliefs: revisePriority
+    })
+    newAgent.next(update)
+    expect(newAgent.beliefs.isRaining.priority).toBe(1)
+  })
+
+  it('should allow configuring a priority belief revision function such that the initial priorities of it beliefs are generally kept', () => {
+    const beliefBase = { isRaining: Belief('isRaining', true, 1) }
+
+    const update = { isRaining: Belief('isRaining', false, 2) }
+
+    const newAgent = new Agent({
+      id: 'myAgent',
+      beliefs: beliefBase,
+      desires,
+      plans,
+      selfUpdatesPossible: false,
+      reviseBeliefs: revisePriorityStatic
+    })
+    newAgent.next(update)
+    expect(newAgent.beliefs.isRaining.priority).toBe(1)
   })
 })

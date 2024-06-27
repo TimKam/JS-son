@@ -1,4 +1,5 @@
 const Belief = require('../../../src/agent/Belief')
+const FunctionalBelief = require('../../../src/agent/FunctionalBelief')
 const Plan = require('../../../src/agent/Plan')
 const Agent = require('../../../src/agent/Agent')
 
@@ -234,5 +235,69 @@ describe('Agent / next(), configuration object-based', () => {
       reviseGoals
     })
     expect(newAgent.next({ ...Belief('dogNice', false) })[0].action).toEqual('Good dog, Hasso!')
+  })
+
+  it('should correctly revise functional beliefs, given new beliefs', () => {
+    const oldBeliefs = {
+      isRaining: Belief('isRaining', true, 0),
+    }
+
+    const isSlippery = FunctionalBelief('isSlippery', false, (_, newBeliefs) => newBeliefs.isRaining.value, 1)
+
+    const newBeliefs1 = {
+      isRaining: Belief('isRaining', false, 0),
+      isSlippery
+    }
+
+    const newBeliefs2 = {
+      isRaining: Belief('isRaining', true, 0),
+      isSlippery
+    }
+
+    const newAgent = new Agent({
+      id: 'myAgent',
+      beliefs: oldBeliefs,
+      desires,
+      plans
+    })
+    newAgent.next(newBeliefs1)
+    expect(newAgent.beliefs.isSlippery.value).toBe(false)
+    newAgent.next(newBeliefs2)
+    expect(newAgent.beliefs.isSlippery.value).toBe(true)
+  })
+
+  it('should correctly revise functional beliefs, given new and old beliefs', () => {
+    const oldBeliefs = {
+      isRaining: Belief('isRaining', true, 0),
+    }
+
+    const isSlippery = FunctionalBelief(
+      'isSlippery',
+      false,
+      (oldBeliefs, newBeliefs) =>
+        (newBeliefs.isRaining && newBeliefs.isRaining.value) ||
+        (!newBeliefs.isRaining && oldBeliefs.isRaining && oldBeliefs.isRaining.value),
+      1
+    )
+
+    const newBeliefs1 = {
+      isSlippery
+    }
+
+    const newBeliefs2 = {
+      isSlippery,
+      isRaining: Belief('isRaining', false, 0)
+    }
+
+    const newAgent = new Agent({
+      id: 'myAgent',
+      beliefs: oldBeliefs,
+      desires,
+      plans
+    })
+    newAgent.next(newBeliefs1)
+    expect(newAgent.beliefs.isSlippery.value).toBe(true)
+    newAgent.next(newBeliefs2)
+    expect(newAgent.beliefs.isSlippery.value).toBe(false)
   })
 })

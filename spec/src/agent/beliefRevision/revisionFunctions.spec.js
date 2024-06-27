@@ -1,10 +1,13 @@
 const Agent = require('../../../../src/agent/Agent')
 const Belief = require('../../../../src/agent/Belief')
+const FunctionalBelief = require('../../../../src/agent/FunctionalBelief')
 const {
   reviseSimpleNonmonotonic,
   reviseMonotonic,
   revisePriority,
-  revisePriorityStatic } = require('../../../../src/agent/beliefRevision/revisionFunctions')
+  revisePriorityStatic,
+  getNonFunctionalBeliefs,
+  preprocessFunctionalBeliefs } = require('../../../../src/agent/beliefRevision/revisionFunctions')
 
 const {
   beliefs,
@@ -133,4 +136,24 @@ describe('revisionFunctions', () => {
     newAgent.next(update)
     expect(newAgent.beliefs.isRaining.priority).toBe(1)
   })
+})
+
+describe('functional belief revision functions', () => {
+  const isRaining = Belief('isRaining', true, 1, false)
+  const isSlippery = FunctionalBelief(
+    'isSlippery', false, (_, newBeliefs) => newBeliefs.isRaining, 0
+  )
+
+  it('(getNonFunctionalBeliefs) should filter out functional beliefs, given a belief base', () => {
+    const nonFunctionalBeliefs = getNonFunctionalBeliefs({isRaining, isSlippery})
+    expect(Object.keys(nonFunctionalBeliefs).length).toEqual(1)
+    expect(nonFunctionalBeliefs.isRaining.value).toEqual(true)
+  })
+
+  it('(preprocessFunctionalBeliefs) should filter out non-functional beliefs, given a belief base', () => {
+    const functionalBeliefs = preprocessFunctionalBeliefs({isRaining, isSlippery})
+    expect(functionalBeliefs.length).toEqual(1)
+    expect(functionalBeliefs[0].value).toEqual(false)
+  })
+
 })

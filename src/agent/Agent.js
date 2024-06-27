@@ -1,5 +1,11 @@
 const Intentions = require('./Intentions')
 const defaultBeliefRevisionFunction = require('./beliefRevision/revisionFunctions').reviseSimpleNonmonotonic
+const {
+  preprocessFunctionalBeliefs,
+  getNonFunctionalBeliefs,
+  getFunctionalBeliefs,
+  processFunctionalBeliefs
+} = require('./beliefRevision/revisionFunctions')
 
 const defaultPreferenceFunction = (beliefs, desires) => desireKey => desires[desireKey](beliefs)
 const defaultGoalRevisionFunction = (beliefs, goals) => goals
@@ -82,7 +88,19 @@ function Agent (
   }
   this.isActive = true
   this.next = function (beliefs) {
-    this.beliefs = this.reviseBeliefs(this.beliefs, beliefs)
+    // revision of non-functional beliefs
+    const oldBeliefs = getNonFunctionalBeliefs(this.beliefs)
+    this.beliefs = this.reviseBeliefs(this.beliefs, getNonFunctionalBeliefs(beliefs))
+    // revision of functional beliefs
+    const newFunctionalBeliefs = processFunctionalBeliefs(
+      getFunctionalBeliefs(this.beliefs),
+      getFunctionalBeliefs(beliefs),
+      oldBeliefs,
+      beliefs,
+      reviseBeliefs
+    )
+    this.beliefs = { ...this.beliefs, ...newFunctionalBeliefs }
+    // end: revision of functional beliefs
     this.goals = this.reviseGoals(this.beliefs, this.goals)
     if (this.isActive) {
       if (Object.keys(this.desires).length === 0) {

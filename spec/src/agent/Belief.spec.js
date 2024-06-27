@@ -2,7 +2,7 @@ const Belief = require('../../../src/agent/Belief')
 
 const warning = 'JS-son: Created belief with non-JSON object, non-JSON data type value'
 
-describe('belief()', () => {
+describe('Belief()', () => {
   console.warn = jasmine.createSpy('warn')
 
   it('should create a new belief with the specified key and value', () => {

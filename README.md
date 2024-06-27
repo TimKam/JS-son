@@ -618,7 +618,7 @@ const update = {
 const agent = new Agent('myAgent', beliefBase, {}, [], undefined, false, revisePriority)
 ```
 
-After applying the belief update, our agent's belief base is as follows:
+After applying the belief update with `agent.next(update)`, our agent's belief base is as follows:
 
 ```JavaScript
 {
@@ -646,6 +646,70 @@ const beliefBase = {
       temperature: Belief('temperature', 10, Infinity, false)
     }
 ```
+
+We may want to specify beliefs that are not simply updated as static objects/properties, but dynamically inferred, based on our current belief base or updates thereof.
+To supports this, JS-son uses the notion of a *functional belief*.
+A functional belief can be specified as follows, for example:
+
+```JavaScript
+const isSlippery = FunctionalBelief(
+      'isSlippery',
+      false,
+      (oldBeliefs, newBeliefs) =>
+        (newBeliefs.isRaining && newBeliefs.isRaining.value) ||
+        (!newBeliefs.isRaining && oldBeliefs.isRaining && oldBeliefs.isRaining.value),
+      1
+    )
+```
+
+The arguments of `FunctionalBelief` have the following meaning:
+
+* `isSlippery` (`id`) is the unique identifier of the (functional) belief,
+* `false` (`value`) is the belief's default/initial value;
+* The function:
+  ```JavaScript
+    (oldBeliefs, newBeliefs) =>
+        (newBeliefs.isRaining && newBeliefs.isRaining.value) ||
+        (!newBeliefs.isRaining && oldBeliefs.isRaining && oldBeliefs.isRaining.value)
+  ```
+ specifies the rule according to which the belief is inferred -- in this simple example, the value of `isSlippery` takes the value of the new belief `isRaining` unless the belief does not exist, in which it will check for the existing (old) belief `isRaining` and return `false` if neither a new nor an old `isRaining` belief exists.
+* `0` (`order`) is the number used for inducing the order in which the functional belief is revised relative to other functional beliefs: e.g., if another functional belief with order `1` is present, then the latter belief is revised later.
+* `2` (`priority`) is the priority that the belief takes when updating the function as well as the default value, analogous to how orders work for non-functional beliefs.
+
+Given this functional belief, we can now demonstrate how functional belief revision works:
+
+1. First, we specify our agent:
+
+```JavaScript
+    const newAgent = new Agent({
+      id: 'myAgent',
+      beliefs: { isRaining: Belief('isRaining', true, 0) },
+      desires,
+      plans
+    })
+    newAgent.next(newBeliefs1)
+    expect(newAgent.beliefs.isSlippery.value).toBe(true)
+    newAgent.next(newBeliefs2)
+    expect(newAgent.beliefs.isSlippery.value).toBe(false)
+```
+
+2. Then, we specify the initial belief base and execute the agent's reasoning loop with a belief base update that merely contains the functional belief:  
+
+```JavaScript
+  newAgent.next({ isSlippery})
+```
+Because ``isRaining`` is not present in the update, our agent infers ``isSlippery`` from its old belief base, i.e., the value of ``isSlippery`` remains ``true``.
+
+3. Finally, we executed the reasoning loop again, with a slightly different belief base update:
+
+```JavaScript
+  newAgent.next({
+      isSlippery,
+      isRaining: Belief('isRaining', false, 0)
+  })
+```
+
+Now, the value of ``isSlippery`` is updated to ``false``, as inferred from the update of ``isRaining``.
 
 ## Messaging
 JS-son agents can send "private" messages to any other JS-son agent, which the environment will then relay to this agent only.

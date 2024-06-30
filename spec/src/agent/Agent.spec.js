@@ -300,4 +300,34 @@ describe('Agent / next(), configuration object-based', () => {
     newAgent.next(newBeliefs2)
     expect(newAgent.beliefs.isSlippery.value).toBe(false)
   })
+
+  it('should correctly execute the EUMAS 2024 paper example', () => {
+    const beliefs = {
+      ...Belief('isRaining', false),
+      ...Belief('isSlippery', false)
+    }
+    
+    const plans = [
+      Plan(
+        beliefs => beliefs.isRaining,
+        () => [{ action: 'take_umbrella' }]
+      ),
+      Plan(
+        beliefs => beliefs.isSlippery,
+        () => [{ action: 'dress_shoes_with_profile' }]
+      )
+    ]
+
+    const newAgent = new Agent('myAgent', beliefs, {}, plans)
+    expect(newAgent.next({ ...Belief('isRaining', true) })[0][0].action).toEqual('take_umbrella')
+
+    const update = {
+      ...Belief('isRaining', true, 1),
+      ...Belief('isSlippery', true, 0)
+    }
+    const execution = newAgent.next(update)
+    expect(execution[0][0].action).toEqual('take_umbrella')
+    expect(execution[1][0].action).toEqual('dress_shoes_with_profile')
+
+  })
 })

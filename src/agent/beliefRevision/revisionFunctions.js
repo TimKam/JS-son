@@ -22,13 +22,13 @@ const reviseMonotonic = (oldBeliefs, newBeliefs) => ({ ...newBeliefs, ...oldBeli
  * @param {object} newBeliefs New belief base (JSON object of beliefs)
  * @returns Revised belief base (JSON object of beliefs)
  */
-const revisePriority = (oldBeliefs, newBeliefs) => Object.fromEntries(
+const revisePriority = (oldBeliefs, newBeliefs) => ({ ...oldBeliefs, ...Object.fromEntries(
   new Map(
     Object.keys(newBeliefs).map(key =>
       !key in oldBeliefs || oldBeliefs[key].priority == 0 || oldBeliefs[key].priority < newBeliefs[key].priority ? oldBeliefs[key].updatePriority ? [key, newBeliefs[key]] : [key, { ...oldBeliefs[key], value: newBeliefs[key].value }] : [key, oldBeliefs[key]]
     )
   )
-)
+) })
 
 /**
  * Revises beliefs by merging old and new beliefs such that an old belief overrides a new one in case of conflict. Does not update belief priorities.

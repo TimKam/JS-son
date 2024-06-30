@@ -104,9 +104,15 @@ describe('revisionFunctions', () => {
   })
 
   it('should allow configuring a belief such that its initial priority is kept', () => {
-    const beliefBase = { isRaining: Belief('isRaining', true, 1, false) }
+    const beliefBase = {
+      isRaining: Belief('isRaining', true, 1, false),
+      isSlippery: Belief('isSlippery', true, 2, true)
+    }
 
-    const update = { isRaining: Belief('isRaining', false, 2) }
+    const update = {
+      isRaining: Belief('isRaining', false, 2),
+      isSlippery: Belief('isSlippery', true, 2, true)
+    }
 
     const newAgent = new Agent({
       id: 'myAgent',
@@ -118,6 +124,7 @@ describe('revisionFunctions', () => {
     })
     newAgent.next(update)
     expect(newAgent.beliefs.isRaining.priority).toBe(1)
+    expect(newAgent.beliefs.isSlippery.priority).toBe(2)
   })
 
   it('should allow configuring a priority belief revision function such that the initial priorities of it beliefs are generally kept', () => {

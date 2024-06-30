@@ -10,6 +10,7 @@ const {
   plans
 } = require('../../mocks/human')
 const Goal = require('../../../src/agent/Goal')
+const { revisePriority } = require('../../../src/agent/beliefRevision/revisionFunctions')
 
 describe('Agent / next()', () => {
   const agent = new Agent('myAgent', beliefs, desires, plans, preferenceFunctionGen)
@@ -303,31 +304,38 @@ describe('Agent / next(), configuration object-based', () => {
 
   it('should correctly execute the EUMAS 2024 paper example', () => {
     const beliefs = {
-      ...Belief('isRaining', false),
-      ...Belief('isSlippery', false)
+      isRaining: Belief('isRaining', false, 0, true),
+      isSlippery: Belief('isSlippery', false, 0, true)
     }
-    
+
     const plans = [
       Plan(
-        beliefs => beliefs.isRaining,
+        beliefs => beliefs.isRaining.value,
         () => [{ action: 'take_umbrella' }]
       ),
       Plan(
-        beliefs => beliefs.isSlippery,
+        beliefs => beliefs.isSlippery.value,
         () => [{ action: 'dress_shoes_with_profile' }]
       )
     ]
 
-    const newAgent = new Agent('myAgent', beliefs, {}, plans)
-    expect(newAgent.next({ ...Belief('isRaining', true) })[0][0].action).toEqual('take_umbrella')
+    const newAgent = new Agent({ id: 'myAgent', beliefs, plans, reviseBeliefs: revisePriority })
+    const initialExecution = newAgent.next({ isRaining: Belief('isRaining', true, 1) })
+    expect(initialExecution[0][0].action).toEqual('take_umbrella')
 
     const update = {
-      ...Belief('isRaining', true, 1),
-      ...Belief('isSlippery', true, 0)
+      isRaining: Belief('isRaining', true, 1),
+      isSlippery: Belief('isSlippery', true, 0)
     }
     const execution = newAgent.next(update)
     expect(execution[0][0].action).toEqual('take_umbrella')
     expect(execution[1][0].action).toEqual('dress_shoes_with_profile')
 
+    const nextExecution = newAgent.next({
+      isRaining: Belief('isRaining', false, 0),
+      isSlippery: Belief('isSlippery', true, 0)
+    })
+    expect(nextExecution[0][0].action).toEqual('take_umbrella')
+    expect(nextExecution[1][0].action).toEqual('dress_shoes_with_profile')
   })
 })

@@ -771,7 +771,7 @@ Contributions that change this are welcome!
 ## Further Content
 * [Grid world tutorial](./gridworld.md)
 * [Serverless tutorial](./serverless.md)
-* [API reference](./api.md)
+* [API reference](https://js-son.readthedocs.io/en/latest/api.html)
 
 ## Testing
 The project uses [Jasime](https://jasmine.github.io/2.0/node.html) for testing.

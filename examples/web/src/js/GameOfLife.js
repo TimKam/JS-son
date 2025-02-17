@@ -29,26 +29,22 @@ const determineNeighborActivity = (index, activityArray) => {
 
 const plans = [ 
   Plan(
-    beliefs => {
-      const neighborActivity = determineNeighborActivity(beliefs.index, beliefs.activityArray)
+    () => true,
+    (beliefs, goalValue) => {
+      const neighborActivity = determineNeighborActivity(
+        beliefs.index, beliefs.activityArray
+      )
       const isActive = beliefs.activityArray[beliefs.index]
-      return (isActive && neighborActivity >= 2 && neighborActivity < 4) ||
-        neighborActivity === 3
-    },
-    () => ({ nextRound: 'active' })
-  ),
-  Plan(
-    beliefs => {
-      const neighborActivity = determineNeighborActivity(beliefs.index, beliefs.activityArray)
-      const isActive = beliefs.activityArray[beliefs.index]
-      return !(isActive && neighborActivity >= 2 && neighborActivity < 4) &&
-        !neighborActivity === 3
-    },
-    () => ({ nextRound: 'inActive' })
-  )
-]
+      return (
+          isActive &&
+          neighborActivity >= 2 &&
+          neighborActivity < 4
+      ) || neighborActivity === 3 ?
+        { nextRound: 'active' } :
+        { nextRound: 'inActive' }
+})]
 
-// generates (pseudo-)random initial activity state (active or inactive)
+// generates initial activity state (active or inactive)
 const generateInitialActivity = () => [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
@@ -88,7 +84,7 @@ const updateState = (actions, agentId, currentState) => {
   }
   const agentActive = actions.some(action => action.nextRound === 'active')
   stateUpdate.nextActivity.push(agentActive)
-  if (agentId === '224') {
+  if (agentId == currentState.previousActivity.length - 1) {
     return {
       previousActivity: stateUpdate.nextActivity,
       nextActivity: []

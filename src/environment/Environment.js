@@ -35,10 +35,10 @@ function Environment (
   this.history = []
   this.runner = runner
   this.reset = () => (this.history = [])
-  this.run = iterations => {
+  this.run = (iterations) => {
     this.history.push(this.state)
     const run = () => {
-      Object.keys(this.agents).forEach(agentKey => {
+      Object.keys(this.agents).forEach(async agentKey => {
         const messages = {}
         Object.keys(this.state.messages).forEach(recipient => {
           Object.keys(this.state.messages[recipient]).forEach(sender => {
@@ -67,7 +67,10 @@ function Environment (
             )
           }
         })
-        const stateUpdate = this.update(proposedUpdate, agentKey, this.state)
+        const updatePromise = this.update(proposedUpdate, agentKey, this.state)
+        const stateUpdate = Promise.resolve(updatePromise) == updatePromise ?
+          await updatePromise :
+          updatePromise
         this.state = {
           ...this.state,
           ...stateUpdate
